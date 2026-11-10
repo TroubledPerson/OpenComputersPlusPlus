@@ -43,6 +43,7 @@ object PacketHandler extends CommonPacketHandler {
 
   override def dispatch(p: PacketParser) {
     p.packetType match {
+      case PacketType.OcppPreviewPower => p.readTileEntity[VMCasePreview]().foreach(_.trySimulatedStart(p.player))
       case PacketType.ComputerPower => onComputerPower(p)
       case PacketType.CopyToAnalyzer => onCopyToAnalyzer(p)
       case PacketType.DriveLock => onDriveLock(p)

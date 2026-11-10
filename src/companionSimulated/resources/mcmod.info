@@ -1,0 +1,1 @@
+[{"modid":"ocpp_vmintegration","name":"OC++ VM Integration (Simulated)","description":"Explicit memory-only QMP fixtures. Production API1/API2 remain offline. No QEMU payload, process, listener, guest execution or disk attachment.","version":"0.3.0-dev.3","mcversion":"1.12.2","authorList":["OpenComputers++ private development"],"dependencies":["opencomputers"]}]

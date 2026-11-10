@@ -1,0 +1,11 @@
+OC++ uses JLayer 1.0.1 (JavaZoom; source headers GNU Library GPL2-or-later,
+LGPL2.1 text provided) and Project Nayuki FLAC library revision
+c9b8727bab49f6da15f47c21bb67ef6de0306cad (LGPL3-or-later).
+These libraries are not relicensed under the mod's MIT license. Copyright and
+license headers remain intact. GPL3/LGPL3 and LGPL2.1 texts accompany the codecs.
+The matching source ZIP contains complete upstream library source archives,
+the unmodified selected FLAC sources, JLayer sources/POM, application source,
+build scripts and acquisition hashes. No GPL/LGPL player application is exposed.
+See AUDIO-CODECS.md for modification/relink/rebuild instructions. Modification
+for personal use and reverse engineering for debugging such modifications are
+permitted. No signing key, permission bypass or online activation is required.

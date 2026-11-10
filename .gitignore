@@ -1,35 +1,44 @@
-# Gradle
-/.gradle
-/build
-
-# Eclipse
-/.classpath
-/.project
-/.settings
-/bin
-
-# IntelliJ IDEA
-/*.iml
-/*.ipr
-/*.iws
-/.idea
-/out
-
-# Debugging
-/eclipse
-/run
-
-# Windows...
-**/Thumbs.db
-
-# OS X
+# Generated output and machine-local state
+.gradle/
+build/
+run/
+logs/
+config/
+saves/
+.idea/
+.vscode/
+.settings/
+bin/
+out/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
 .DS_Store
-/run
-
-# VSCode
-/.vscode
-/saves
-/logs
-/config
-/options.txt
-/usernamecache.json
+Thumbs.db
+usernamecache.json
+options.txt
+# Private development evidence and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+local.properties
+test-evidence*/
+TEST-RESULTS*
+verification/
+preserved/
+deliverables/
+build-home/
+build-cache/
+build-temp/
+*.log
+# Not part of the publication-cleared source snapshot
+src/companionEmbedded/
+src/companionEmbeddedTest/

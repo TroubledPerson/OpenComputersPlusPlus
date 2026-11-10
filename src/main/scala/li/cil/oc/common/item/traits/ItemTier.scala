@@ -16,7 +16,9 @@ trait ItemTier extends Delegate {
   override def tooltipLines(stack: ItemStack, world: World, tooltip: util.List[String], flag: ITooltipFlag) {
     super.tooltipLines(stack, world, tooltip, flag)
     if (flag.isAdvanced) {
-      tooltip.add(Localization.Tooltip.Tier(tierFromDriver(stack) + 1))
+      val tier = tierFromDriver(stack)
+      tooltip.add(li.cil.oc.plusplus.TierText.line(tier,
+        Localization.Tooltip.Tier(li.cil.oc.plusplus.TierProfiles.displayTier(tier))))
     }
   }
 }

@@ -25,13 +25,16 @@ object DriverFileSystem extends Item {
     api.Items.get(Constants.ItemName.HDDTier1),
     api.Items.get(Constants.ItemName.HDDTier2),
     api.Items.get(Constants.ItemName.HDDTier3),
+    api.Items.get("ocpp_hdd4"),
+    api.Items.get("ocpp_hdd5"),
+    api.Items.get("ocpp_hdd6"),
     api.Items.get(Constants.ItemName.Floppy)) &&
     (!stack.hasTagCompound || !stack.getTagCompound.hasKey(Settings.namespace + "lootPath"))
 
   override def createEnvironment(stack: ItemStack, host: EnvironmentHost) =
     if (host.world != null && host.world.isRemote) null
     else Delegator.subItem(stack) match {
-      case Some(hdd: HardDiskDrive) => createEnvironment(stack, hdd.kiloBytes * 1024, hdd.platterCount, host, hdd.tier + 2)
+      case Some(hdd: HardDiskDrive) => createEnvironment(stack, hdd.kiloBytes * 1024, hdd.platterCount, host, (hdd.tier min 2) + 2)
       case Some(disk: FloppyDisk) => createEnvironment(stack, Settings.get.floppySize * 1024, 1, host, 1)
       case _ => null
     }

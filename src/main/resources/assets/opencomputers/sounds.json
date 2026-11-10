@@ -2,7 +2,10 @@
   "computer_running": {
     "category": "block",
     "sounds": [
-      {"name": "opencomputers:computer_running", "stream": true}
+      {
+        "name": "opencomputers:computer_running",
+        "stream": true
+      }
     ]
   },
   "floppy_access": {
@@ -28,6 +31,60 @@
       "opencomputers:floppy_insert"
     ]
   },
+  "ocpp_cd_open": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "opencomputers:ocpp/cd_open",
+        "stream": false
+      }
+    ]
+  },
+  "ocpp_cd_close": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "opencomputers:ocpp/cd_close",
+        "stream": false
+      }
+    ]
+  },
+  "ocpp_cd_read": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "opencomputers:ocpp/cd_read",
+        "stream": true
+      }
+    ]
+  },
+  "ocpp_cd_motor": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "opencomputers:ocpp/cd_motor",
+        "stream": false
+      }
+    ]
+  },
+  "ocpp_cd_spinup": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "opencomputers:ocpp/cd_spinup",
+        "stream": false
+      }
+    ]
+  },
+  "ocpp_cd_seek": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "opencomputers:ocpp/cd_seek",
+        "stream": false
+      }
+    ]
+  },
   "hdd_access": {
     "category": "block",
     "sounds": [
@@ -38,6 +95,15 @@
       "opencomputers:hdd_access5",
       "opencomputers:hdd_access6",
       "opencomputers:hdd_access7"
+    ]
+  },
+  "ocpp_cd_stop": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "opencomputers:ocpp/cd_stop",
+        "stream": false
+      }
     ]
   }
 }

@@ -40,7 +40,9 @@ trait VideoRamDevice {
   def loadBuffer(address: String, id: Int, nbt: NBTTagCompound): Unit = {
     val src = new li.cil.oc.util.TextBuffer(width = 1, height = 1, li.cil.oc.util.PackedColor.SingleBitFormat)
     src.load(nbt)
-    addBuffer(component.GpuTextBuffer.wrap(address, id, src))
+    val page = component.GpuTextBuffer.wrap(address, id, src)
+    if (nbt.hasKey("ocppMaximumDepth")) page.setMaximumColorDepth(li.cil.oc.api.internal.TextBuffer.ColorDepth.values.apply(nbt.getInteger("ocppMaximumDepth") max src.format.depth.ordinal min 5))
+    addBuffer(page)
   }
 
   def getBuffer(id: Int): Option[component.GpuTextBuffer] = {

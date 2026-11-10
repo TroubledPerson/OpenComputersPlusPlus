@@ -38,6 +38,9 @@ object GuiType extends ScalaEnum {
   val TabletInner = new EnumVal { def name = "TabletInner"; def subType = GuiType.Category.Item }
   val Terminal = new EnumVal { def name = "Terminal"; def subType = GuiType.Category.Item }
   val Waypoint = new EnumVal { def name = "Waypoint"; def subType = GuiType.Category.Block }
+  // Append only: preserve every existing GUI protocol ordinal.
+  val VMCasePreview = new EnumVal { def name = "VMCasePreview"; def subType = GuiType.Category.Block }
+  val VMScreenPreview = new EnumVal { def name = "VMScreenPreview"; def subType = GuiType.Category.Block }
 
   object Category extends ScalaEnum {
     sealed trait EnumVal extends Value

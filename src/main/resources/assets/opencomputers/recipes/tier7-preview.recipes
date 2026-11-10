@@ -1,0 +1,8 @@
+# Nonfunctional screen preview. Explicit enchanted-apple metadata; output is labelled.
+ocpp_screen7_preview {
+  type: shaped
+  input: [["minecraft:beacon",{item:"minecraft:golden_apple",subID:1},"minecraft:beacon"],
+          [{item:"minecraft:golden_apple",subID:1},"oc:ocpp_screen6",{item:"minecraft:golden_apple",subID:1}],
+          ["minecraft:beacon",{item:"minecraft:golden_apple",subID:1},"minecraft:beacon"]]
+  output: 1
+}

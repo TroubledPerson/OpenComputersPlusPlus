@@ -1,6 +1,12 @@
 # Do not change this file, it is rewritten each time you start the game.
 # Instead, use the user.recipes file to edit recipes by redefining them there.
 
+# OC++ defaults remain below later user/optional includes in priority.
+include file("plusplus.recipes")
+include file("optical.recipes")
+include file("sound.recipes")
+include file("tier7-preview.recipes")
+
 analyzer {
   input: [[torchRedstoneActive, "", ""]
           ["oc:materialTransistor", nuggetGold, ""]
@@ -683,9 +689,9 @@ screen2 {
           [ingotGold, dyeBlue, ingotGold]]
 }
 screen3 {
-  input: [[obsidian, yellowDust, obsidian]
+  input: [["minecraft:diamond", yellowDust, "minecraft:diamond"]
           [yellowDust, "oc:circuitChip3", blockGlass]
-          [obsidian, yellowDust, obsidian]]
+          ["minecraft:diamond", yellowDust, "minecraft:diamond"]]
 }
 transposer {
   input: [[ingotIron, "oc:inventoryControllerUpgrade", ingotIron]

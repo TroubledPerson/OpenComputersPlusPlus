@@ -62,17 +62,22 @@ class GraphicsCard(val tier: Int) extends AbstractManagedEnvironment with Device
 
   private def screen(f: (api.internal.TextBuffer) => Array[AnyRef]): Array[AnyRef] = screen(bufferIndex, f)
 
-  final val setBackgroundCosts = Array(1.0 / 32, 1.0 / 64, 1.0 / 128)
-  final val setForegroundCosts = Array(1.0 / 32, 1.0 / 64, 1.0 / 128)
-  final val setPaletteColorCosts = Array(1.0 / 2, 1.0 / 8, 1.0 / 16)
-  final val setCosts = Array(1.0 / 64, 1.0 / 128, 1.0 / 256)
-  final val copyCosts = Array(1.0 / 16, 1.0 / 32, 1.0 / 64)
-  final val fillCosts = Array(1.0 / 32, 1.0 / 64, 1.0 / 128)
+  private def areaScale(t: Int): Double = {
+    li.cil.oc.plusplus.GpuCallCosts.areaScale(t)
+  }
+  private def extendedCosts(legacy: Array[Double]): Array[Double] =
+    legacy ++ Array(legacy.last) ++ (4 to 6).map(t => legacy.last * areaScale(t))
+  final val setBackgroundCosts = extendedCosts(Array(1.0 / 32, 1.0 / 64, 1.0 / 128))
+  final val setForegroundCosts = extendedCosts(Array(1.0 / 32, 1.0 / 64, 1.0 / 128))
+  final val setPaletteColorCosts = extendedCosts(Array(1.0 / 2, 1.0 / 8, 1.0 / 16))
+  final val setCosts = extendedCosts(Array(1.0 / 64, 1.0 / 128, 1.0 / 256))
+  final val copyCosts = extendedCosts(Array(1.0 / 16, 1.0 / 32, 1.0 / 64))
+  final val fillCosts = extendedCosts(Array(1.0 / 32, 1.0 / 64, 1.0 / 128))
   // These are dirty page bitblt budget costs
   // a single bitblt can send a screen of data, which is n*set calls where set is writing an entire line
   // So for each tier, we multiple the set cost with the number of lines the screen may have
-  final val bitbltCost: Double = Settings.get.bitbltCost * scala.math.pow(2, tier)
-  final val totalVRAM: Double = (maxResolution._1 * maxResolution._2) * Settings.get.vramSizes(0 max tier min 2)
+  final val bitbltCost: Double = Settings.get.bitbltCost * (if (tier >= 4) 4 * areaScale(tier) else scala.math.pow(2, tier))
+  final val totalVRAM: Double = (maxResolution._1 * maxResolution._2) * Settings.get.vramSizes(0 max tier min (Settings.get.vramSizes.length - 1))
 
   var budgetExhausted: Boolean = false // for especially expensive calls, bitblt
 
@@ -82,7 +87,7 @@ class GraphicsCard(val tier: Int) extends AbstractManagedEnvironment with Device
     DeviceAttribute.Class -> DeviceClass.Display,
     DeviceAttribute.Description -> "Graphics controller",
     DeviceAttribute.Vendor -> Constants.DeviceInfo.DefaultVendor,
-    DeviceAttribute.Product -> ("MPG" + ((tier + 1) * 1000).toString + " GTZ"),
+    DeviceAttribute.Product -> ("MPG" + (li.cil.oc.plusplus.TierProfiles.displayTier(tier) * 1000).toString + " GTZ"),
     DeviceAttribute.Capacity -> capacityInfo,
     DeviceAttribute.Width -> widthInfo,
     DeviceAttribute.Clock -> clockInfo
@@ -90,7 +95,7 @@ class GraphicsCard(val tier: Int) extends AbstractManagedEnvironment with Device
 
   def capacityInfo: String = (maxResolution._1 * maxResolution._2).toString
 
-  def widthInfo: String = Array("1", "4", "8").apply(maxDepth.ordinal())
+  def widthInfo: String = PackedColor.Depth.bits(maxDepth).toString
 
   def clockInfo: String = ((2000 / setBackgroundCosts(tier)).toInt / 100).toString + "/" + ((2000 / setForegroundCosts(tier)).toInt / 100).toString + "/" + ((2000 / setPaletteColorCosts(tier)).toInt / 100).toString + "/" + ((2000 / setCosts(tier)).toInt / 100).toString + "/" + ((2000 / copyCosts(tier)).toInt / 100).toString + "/" + ((2000 / fillCosts(tier)).toInt / 100).toString
 
@@ -136,9 +141,12 @@ class GraphicsCard(val tier: Int) extends AbstractManagedEnvironment with Device
   def allocateBuffer(context: Context, args: Arguments): Array[AnyRef] = {
     val width: Int = args.optInteger(0, maxResolution._1)
     val height: Int = args.optInteger(1, maxResolution._2)
-    val size: Int = width * height
+    val size: Long = width.toLong * height.toLong
     if (width <= 0 || height <= 0) {
       result(Unit, "invalid page dimensions: must be greater than zero")
+    }
+    else if (tier >= 4 && (width > 480 || height > 480)) {
+      result(Unit, "page dimensions exceed 480 characters")
     }
     else if (size > (totalVRAM - calculateUsedMemory)) {
       result(Unit, "not enough video memory")
@@ -148,6 +156,7 @@ class GraphicsCard(val tier: Int) extends AbstractManagedEnvironment with Device
       val format: PackedColor.ColorFormat = PackedColor.Depth.format(Settings.screenDepthsByTier(tier))
       val buffer = new li.cil.oc.util.TextBuffer(width, height, format)
       val page = component.GpuTextBuffer.wrap(node.address, nextAvailableBufferIndex, buffer)
+      if (tier >= 4) page.setColorDepth(api.internal.TextBuffer.ColorDepth.EightBit)
       addBuffer(page)
       result(page.id)
     }
@@ -233,7 +242,7 @@ class GraphicsCard(val tier: Int) extends AbstractManagedEnvironment with Device
 
         var budgetCost: Double = determineBitbltBudgetCost(dst, src)
         val energyCost: Double = determineBitbltEnergyCost(dst)
-        val tierCredit: Double = ((tier + 1) * .5)
+        val tierCredit: Double = if (tier >= 4) 1.5 else ((tier + 1) * .5)
         val overBudget: Double = budgetCost - tierCredit
 
         if (overBudget > 0) {
@@ -282,7 +291,7 @@ class GraphicsCard(val tier: Int) extends AbstractManagedEnvironment with Device
             val smw = s.getMaximumWidth
             val smh = s.getMaximumHeight
             s.setResolution(math.min(gmw, smw), math.min(gmh, smh))
-            s.setColorDepth(api.internal.TextBuffer.ColorDepth.values.apply(math.min(maxDepth.ordinal, s.getMaximumColorDepth.ordinal)))
+            s.setColorDepth(api.internal.TextBuffer.ColorDepth.values.apply(math.min(api.internal.TextBuffer.ColorDepth.EightBit.ordinal, math.min(maxDepth.ordinal, s.getMaximumColorDepth.ordinal))))
             s.setForegroundColor(0xFFFFFF)
             s.setBackgroundColor(0x000000)
             s match {
@@ -378,6 +387,39 @@ class GraphicsCard(val tier: Int) extends AbstractManagedEnvironment with Device
   def getDepth(context: Context, args: Arguments): Array[AnyRef] =
     screen(s => result(PackedColor.Depth.bits(s.getColorDepth)))
 
+  @Callback(direct = true, doc = """function(rgba:number):number -- Sets an explicit 0xRRGGBBAA foreground in 32-bit mode; returns the prior RGBA brush.""")
+  def setForegroundRGBA(context: Context, args: Arguments): Array[AnyRef] = {
+    val rgba = li.cil.oc.plusplus.ColorCodec.checkedRgba(args.checkDouble(0))
+    if (bufferIndex == RESERVED_SCREEN_INDEX) context.consumeCallBudget(setForegroundCosts(tier))
+    screen(s => {
+      val old = li.cil.oc.plusplus.ColorCodec.rgba(s.getForegroundColor, s.getForegroundAlpha)
+      s.setForegroundColorRGBA((rgba >>> 8).toInt, (rgba & 255).toInt)
+      result(old)
+    })
+  }
+
+  @Callback(direct = true, doc = """function(rgba:number):number -- Sets an explicit 0xRRGGBBAA background in 32-bit mode; returns the prior RGBA brush.""")
+  def setBackgroundRGBA(context: Context, args: Arguments): Array[AnyRef] = {
+    val rgba = li.cil.oc.plusplus.ColorCodec.checkedRgba(args.checkDouble(0))
+    if (bufferIndex == RESERVED_SCREEN_INDEX) context.consumeCallBudget(setBackgroundCosts(tier))
+    screen(s => {
+      val old = li.cil.oc.plusplus.ColorCodec.rgba(s.getBackgroundColor, s.getBackgroundAlpha)
+      s.setBackgroundColorRGBA((rgba >>> 8).toInt, (rgba & 255).toInt)
+      result(old)
+    })
+  }
+
+  @Callback(direct = true, doc = """function(x:number,y:number):string,number,number -- Returns the character and stored foreground/background as 0xRRGGBBAA.""")
+  def getRGBA(context: Context, args: Arguments): Array[AnyRef] = {
+    val x = args.checkInteger(0) - 1
+    val y = args.checkInteger(1) - 1
+    screen(s => {
+      val fg = if (s.isForegroundFromPalette(x, y)) s.getPaletteColor(s.getForegroundColor(x, y)) else s.getForegroundColor(x, y)
+      val bg = if (s.isBackgroundFromPalette(x, y)) s.getPaletteColor(s.getBackgroundColor(x, y)) else s.getBackgroundColor(x, y)
+      result(new String(Character.toChars(s.getCodePoint(x, y))), li.cil.oc.plusplus.ColorCodec.rgba(fg, s.getForegroundAlpha(x, y)), li.cil.oc.plusplus.ColorCodec.rgba(bg, s.getBackgroundAlpha(x, y)))
+    })
+  }
+
   @Callback(doc = """function(depth:number):number -- Set the color depth. Returns the previous value.""")
   def setDepth(context: Context, args: Arguments): Array[AnyRef] = {
     val depth = args.checkInteger(0)
@@ -387,9 +429,12 @@ class GraphicsCard(val tier: Int) extends AbstractManagedEnvironment with Device
         case 1 => s.setColorDepth(api.internal.TextBuffer.ColorDepth.OneBit)
         case 4 if maxDepth.ordinal >= api.internal.TextBuffer.ColorDepth.FourBit.ordinal => s.setColorDepth(api.internal.TextBuffer.ColorDepth.FourBit)
         case 8 if maxDepth.ordinal >= api.internal.TextBuffer.ColorDepth.EightBit.ordinal => s.setColorDepth(api.internal.TextBuffer.ColorDepth.EightBit)
+        case 16 if maxDepth.ordinal >= api.internal.TextBuffer.ColorDepth.SixteenBit.ordinal => s.setColorDepth(api.internal.TextBuffer.ColorDepth.SixteenBit)
+        case 24 if maxDepth.ordinal >= api.internal.TextBuffer.ColorDepth.TwentyFourBit.ordinal => s.setColorDepth(api.internal.TextBuffer.ColorDepth.TwentyFourBit)
+        case 32 if maxDepth.ordinal >= api.internal.TextBuffer.ColorDepth.ThirtyTwoBit.ordinal => s.setColorDepth(api.internal.TextBuffer.ColorDepth.ThirtyTwoBit)
         case _ => throw new IllegalArgumentException("unsupported depth")
       }
-      result(oldDepth)
+      result(PackedColor.Depth.bits(oldDepth))
     })
   }
 
@@ -551,7 +596,7 @@ class GraphicsCard(val tier: Int) extends AbstractManagedEnvironment with Device
         val smw = s.getMaximumWidth
         val smh = s.getMaximumHeight
         s.setResolution(math.min(gmw, smw), math.min(gmh, smh))
-        s.setColorDepth(api.internal.TextBuffer.ColorDepth.values.apply(math.min(maxDepth.ordinal, s.getMaximumColorDepth.ordinal)))
+        s.setColorDepth(api.internal.TextBuffer.ColorDepth.values.apply(math.min(api.internal.TextBuffer.ColorDepth.EightBit.ordinal, math.min(maxDepth.ordinal, s.getMaximumColorDepth.ordinal))))
         s.setForegroundColor(0xFFFFFF)
         val w = s.getWidth
         val h = s.getHeight
@@ -640,6 +685,7 @@ class GraphicsCard(val tier: Int) extends AbstractManagedEnvironment with Device
         val idx: Int = nbtPage.getInteger(NBT_PAGE_IDX)
         val data = nbtPage.getCompoundTag(NBT_PAGE_DATA)
         loadBuffer(node.address, idx, data)
+        getBuffer(idx).foreach(_.setMaximumColorDepth(maxDepth))
       }
     }
   }

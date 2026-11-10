@@ -95,7 +95,7 @@ class Case(var tier: Int) extends traits.PowerAcceptor with traits.Computer with
   private final val TierTag = Settings.namespace + "tier"
 
   override def readFromNBTForServer(nbt: NBTTagCompound) {
-    tier = nbt.getByte(TierTag) max 0 min 3
+    tier = nbt.getByte(TierTag) max 0 min li.cil.oc.plusplus.TierProfiles.LAST
     setColor(Color.rgbValues(Color.byTier(tier)))
     super.readFromNBTForServer(nbt)
     isSizeInventoryReady = true
@@ -111,7 +111,7 @@ class Case(var tier: Int) extends traits.PowerAcceptor with traits.Computer with
   override protected def onItemAdded(slot: Int, stack: ItemStack) {
     super.onItemAdded(slot, stack)
     if (isServer) {
-      if (InventorySlots.computer(tier)(slot).slot == Slot.Floppy) {
+      if (InventorySlots.computerByTier(tier)(slot).slot == Slot.Floppy) {
         common.Sound.playDiskInsert(this)
       }
     }
@@ -120,7 +120,7 @@ class Case(var tier: Int) extends traits.PowerAcceptor with traits.Computer with
   override protected def onItemRemoved(slot: Int, stack: ItemStack) {
     super.onItemRemoved(slot, stack)
     if (isServer) {
-      val slotType = InventorySlots.computer(tier)(slot).slot
+      val slotType = InventorySlots.computerByTier(tier)(slot).slot
       if (slotType == Slot.Floppy) {
         common.Sound.playDiskEject(this)
       }
@@ -130,14 +130,14 @@ class Case(var tier: Int) extends traits.PowerAcceptor with traits.Computer with
     }
   }
 
-  override def getSizeInventory = if (tier < 0 || tier >= InventorySlots.computer.length) 0 else InventorySlots.computer(tier).length
+  override def getSizeInventory = if (tier < 0 || tier >= InventorySlots.computerByTier.length) 0 else InventorySlots.computerByTier(tier).length
 
   override def isUsableByPlayer(player: EntityPlayer) =
     super.isUsableByPlayer(player) && (!isCreative || player.capabilities.isCreativeMode)
 
   override def isItemValidForSlot(slot: Int, stack: ItemStack) =
     Option(Driver.driverFor(stack, getClass)).fold(false)(driver => {
-      val provided = InventorySlots.computer(tier)(slot)
-      driver.slot(stack) == provided.slot && driver.tier(stack) <= provided.tier
+      val provided = InventorySlots.computerByTier(tier)(slot)
+      provided.accepts(driver.slot(stack), driver.tier(stack))
     })
 }

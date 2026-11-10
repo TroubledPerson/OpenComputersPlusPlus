@@ -50,6 +50,9 @@ object ItemUtils {
     else if (descriptor == api.Items.get(Constants.BlockName.CaseTier2)) Tier.Two
     else if (descriptor == api.Items.get(Constants.BlockName.CaseTier3)) Tier.Three
     else if (descriptor == api.Items.get(Constants.BlockName.CaseCreative)) Tier.Four
+    else if (descriptor == api.Items.get("ocpp_case4")) 4
+    else if (descriptor == api.Items.get("ocpp_case5")) 5
+    else if (descriptor == api.Items.get("ocpp_case6")) 6
     else if (descriptor == api.Items.get(Constants.ItemName.MicrocontrollerCaseTier1)) Tier.One
     else if (descriptor == api.Items.get(Constants.ItemName.MicrocontrollerCaseTier2)) Tier.Two
     else if (descriptor == api.Items.get(Constants.ItemName.MicrocontrollerCaseCreative)) Tier.Four
@@ -66,7 +69,9 @@ object ItemUtils {
     else Tier.None
   }
 
-  def caseNameWithTierSuffix(name: String, tier: Int): String = name + (if (tier == Tier.Four) "creative" else (tier + 1).toString)
+  def caseNameWithTierSuffix(name: String, tier: Int): String =
+    if (tier >= 4 && tier <= 6) "ocpp_" + name + tier
+    else name + (if (tier == Tier.Four) "creative" else (tier + 1).toString)
 
   def loadTag(data: Array[Byte]): NBTTagCompound = {
     val bais = new ByteArrayInputStream(data)

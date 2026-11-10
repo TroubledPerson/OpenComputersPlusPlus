@@ -62,7 +62,8 @@ object Color {
     "dyeOrange" -> EnumDyeColor.ORANGE,
     "dyeWhite" -> EnumDyeColor.WHITE)
 
-  val byTier = Array(EnumDyeColor.SILVER, EnumDyeColor.YELLOW, EnumDyeColor.CYAN, EnumDyeColor.MAGENTA)
+  val byTier = Array(EnumDyeColor.SILVER, EnumDyeColor.YELLOW, EnumDyeColor.CYAN, EnumDyeColor.MAGENTA,
+    EnumDyeColor.LIME, EnumDyeColor.ORANGE, EnumDyeColor.RED)
 
   def byMeta(meta: EnumDyeColor) = byOreName(dyes(meta.getDyeDamage))
 

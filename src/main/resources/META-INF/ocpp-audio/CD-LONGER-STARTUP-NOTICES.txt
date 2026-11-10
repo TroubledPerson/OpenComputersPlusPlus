@@ -1,0 +1,6 @@
+PS_Mechanical_BluRay_Spin_Up_01 by Marcus Dellicompagni / PoundSoundUK
+https://freesound.org/people/PoundSoundUK/sounds/718390/
+CC BY4.0 https://creativecommons.org/licenses/by/4.0/
+
+Owner-approved 2.51-second longer settling startup replaces the previous 1.85-second startup. The approved 2.4-second startup-family loop, event-1 read cue, refined natural stop and preferred tray sounds remain unchanged from dev30. Necessary mono96kHz PCM16 to mono44.1kHz Vorbis quality5 conversion only; no further creative filtering, gain normalization, pitch or crossfade treatment. Earlier excerpt/separation and refined-stop beginning trim of0.191333s remain disclosed.
+Audio remains separately licensed from the mod code MIT. No endorsement implied. Original notices retained.

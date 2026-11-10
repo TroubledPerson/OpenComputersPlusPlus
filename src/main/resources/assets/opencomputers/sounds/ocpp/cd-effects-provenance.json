@@ -1,0 +1,63 @@
+{
+  "ownerConfirmedTrayOrder": "first opens, second closes",
+  "modelAudibleInspection": false,
+  "trimValidation": "Owner labelled events; waveform and four decoded quiet margins below-40dB verified cut locations",
+  "processing": "22.05kHz mono Vorbis quality3; loudnorm I=-24 TP=-3 LRA7;25ms fade in,50ms fade out; final duration trim removes filter padding; full reading source, no loop splice",
+  "sources": [
+    {
+      "id": 605300,
+      "sha256": "0436282f41df08f4fc6f5af8a58687ecf10d49240e3aa07561ce58fd39991c4b",
+      "author": "tohubohu",
+      "url": "https://pixabay.com/sound-effects/film-special-effects-dvd-player-open-and-close-605300/"
+    },
+    {
+      "id": 70282,
+      "sha256": "1df86c01f3e54c71c4c5b79100df21140d36b847d1f55bece17ba3dd42ec8b5b",
+      "author": "supersnd (Freesound), freesound_community",
+      "url": "https://pixabay.com/sound-effects/technology-cd-rom-reading-cd-70282/"
+    }
+  ],
+  "license": "Pixabay Content License",
+  "licenseUrl": "https://pixabay.com/service/license-summary/",
+  "assets": [
+    {
+      "event": "ocpp_cd_open",
+      "file": "cd_open.ogg",
+      "sourceId": 605300,
+      "sourceStartSeconds": 0.2,
+      "sourceEndSeconds": 2.15,
+      "durationSeconds": 1.950023,
+      "sampleRate": 22050,
+      "channels": 1,
+      "codec": "vorbis",
+      "decodedPeakDb": -4.6,
+      "sha256": "01e9e25e8a9d5a1c6a8a95685a7e1116ac30942056bd7f2df43373833969cb04"
+    },
+    {
+      "event": "ocpp_cd_close",
+      "file": "cd_close.ogg",
+      "sourceId": 605300,
+      "sourceStartSeconds": 4.5,
+      "sourceEndSeconds": 6.5,
+      "durationSeconds": 2.0,
+      "sampleRate": 22050,
+      "channels": 1,
+      "codec": "vorbis",
+      "decodedPeakDb": -2.4,
+      "sha256": "1ab3c64bb8c1da29c8bfdf15c005a2ace634f068095d165ace24583fbf4b5283"
+    },
+    {
+      "event": "ocpp_cd_read",
+      "file": "cd_read.ogg",
+      "sourceId": 70282,
+      "sourceStartSeconds": 0,
+      "sourceEndSeconds": 36.101219,
+      "durationSeconds": 36.101224,
+      "sampleRate": 22050,
+      "channels": 1,
+      "codec": "vorbis",
+      "decodedPeakDb": -3.1,
+      "sha256": "f93f51af9b3d9485687d989335e14d4a1883503d75de25e8566fbb91cd045112"
+    }
+  ]
+}

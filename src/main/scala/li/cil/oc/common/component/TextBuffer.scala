@@ -140,8 +140,8 @@ class TextBuffer(val host: EnvironmentHost) extends AbstractManagedEnvironment w
           for (x <- 0 until w) {
             val char = line(x)
             val color = colors(x)
-            val bg = PackedColor.unpackBackground(color, data.format)
-            val fg = PackedColor.unpackForeground(color, data.format)
+            val bg = PackedColor.renderBackground(color, data.format)
+            val fg = PackedColor.renderForeground(color, data.format)
             acc += (if (char == ' ') if (bg == 0) 0 else 1
             else if (char == 0x2588) if (fg == 0) 0 else 1
             else if (fg == 0 && bg == 0) 0 else 1)
@@ -215,7 +215,7 @@ class TextBuffer(val host: EnvironmentHost) extends AbstractManagedEnvironment w
   def setPrecise(computer: Context, args: Arguments): Array[AnyRef] = {
     // Available for T3 screens only... easiest way to check for us is to
     // base it off of the maximum color depth.
-    if (maxDepth == Settings.screenDepthsByTier(Tier.Three)) {
+    if (maxDepth.ordinal >= Settings.screenDepthsByTier(Tier.Three).ordinal) {
       val oldValue = precisionMode
       precisionMode = args.checkBoolean(0)
       result(oldValue)

@@ -72,7 +72,7 @@ object Textures {
 
   object Icons extends TextureBundle {
     private val ForSlotType = Slot.All.map(name => name -> L(name)).toMap
-    private val ForTier = Map(Tier.None -> L("na")) ++ (Tier.One to Tier.Three).map(tier => tier -> L("tier" + tier)).toMap
+    private val ForTier = Map(Tier.None -> L("na")) ++ ((Tier.One to Tier.Three) ++ (4 to 6)).map(tier => tier -> L("tier" + tier)).toMap
 
     def get(slotType: String) = ForSlotType.get(slotType).orNull
 
@@ -525,6 +525,10 @@ object Textures {
     }
 
     Screen.makeSureThisIsInitialized()
+
+    // Separate snow-white variants; ordinary screen resources and tinting stay intact.
+    private val vmScreenParts=Array("b","b2","bbl","bbl2","bbm","bbm2","bbr","bbr2","bhb","bhb2","bhm","bhm2","bht","bht2","bml","bmm","bmr","btl","btm","btr","bvb","bvb2","bvm","bvt","f","f2","fbl","fbl2","fbm","fbm2","fbr","fbr2","fhb","fhb2","fhm","fhm2","fht","fht2","fml","fmm","fmr","ftl","ftm","ftr","fvb","fvb2","fvm","fvt").map(name=>name->L("ocpp_vm_screen/"+name)).toMap
+    def vmScreen(native: ResourceLocation): ResourceLocation = vmScreenParts(native.getPath.stripPrefix("blocks/screen/"))
 
     def bind(): Unit = Textures.bind(TextureMap.LOCATION_BLOCKS_TEXTURE)
 

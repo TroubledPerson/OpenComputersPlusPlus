@@ -15,6 +15,10 @@ abstract class GuiHandler extends IGuiHandler {
     GuiType.Categories.get(id) match {
       case Some(GuiType.Category.Block) =>
         world.getTileEntity(BlockPosition(x, GuiType.extractY(y), z)) match {
+          case t: tileentity.VMScreenPreview if id == GuiType.VMScreenPreview.id =>
+            new container.VMScreenPreview(t,player)
+          case t: tileentity.VMCasePreview if id == GuiType.VMCasePreview.id =>
+            new container.VMCasePreview(t,player.inventory)
           case t: tileentity.Adapter if id == GuiType.Adapter.id =>
             new container.Adapter(player.inventory, t)
           case t: tileentity.Assembler if id == GuiType.Assembler.id =>

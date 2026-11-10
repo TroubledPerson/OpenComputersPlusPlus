@@ -336,6 +336,7 @@ object Items extends ItemAPI {
     initUpgrades()
     initStorage()
     initSpecial()
+    PlusPlus.init()
 
     // Register aliases.
     for ((k, v) <- aliases) {
@@ -550,7 +551,7 @@ object Items extends ItemAPI {
     registerItem(new item.Present(misc), Constants.ItemName.Present)
   }
 
-  private def newItem[T <: Item](item: T, name: String): T = {
+  private[init] def newItem[T <: Item](item: T, name: String): T = {
     item.setTranslationKey("oc." + name)
     GameData.register_impl(item.setRegistryName(new ResourceLocation(Settings.resourceDomain, name)))
     item

@@ -52,10 +52,18 @@ class TextBuffer(var width: Int, var height: Int, initialFormat: PackedColor.Col
         val rowColor = color(row)
         for (col <- 0 until width) {
           val packed = rowColor(col)
-          val fg = PackedColor.Color(PackedColor.unpackForeground(packed, _format))
-          val bg = PackedColor.Color(PackedColor.unpackBackground(packed, _format))
+          val fg = PackedColor.foregroundColor(packed, _format)
+          val bg = PackedColor.backgroundColor(packed, _format)
           rowColor(col) = PackedColor.pack(fg, bg, value)
         }
+      }
+      if (value.depth.ordinal > api.internal.TextBuffer.ColorDepth.EightBit.ordinal) {
+        if (_foreground.isPalette) _foreground = PackedColor.Color(_format.inflate(_foreground.value))
+        if (_background.isPalette) _background = PackedColor.Color(_format.inflate(_background.value))
+      }
+      if (value.depth != api.internal.TextBuffer.ColorDepth.ThirtyTwoBit) {
+        _foreground = _foreground.copy(alpha = 255)
+        _background = _background.copy(alpha = 255)
       }
       _format = value
       packed = PackedColor.pack(_foreground, _background, _format)
@@ -226,8 +234,8 @@ class TextBuffer(var width: Int, var height: Int, initialFormat: PackedColor.Col
         var srcColor = src.color(fromRow + yOffset - 1)(fromCol + xOffset - 1)
 
         if (this.format.depth != src.format.depth) {
-          val fg = PackedColor.Color(PackedColor.unpackForeground(srcColor, src.format))
-          val bg = PackedColor.Color(PackedColor.unpackBackground(srcColor, src.format))
+          val fg = PackedColor.foregroundColor(srcColor, src.format)
+          val bg = PackedColor.backgroundColor(srcColor, src.format)
           srcColor = PackedColor.pack(fg, bg, format)
         }
 
@@ -242,7 +250,7 @@ class TextBuffer(var width: Int, var height: Int, initialFormat: PackedColor.Col
     changed
   }
 
-  private def setChar(line: Array[Int], lineColor: Array[Short], x: Int, c: Int) {
+  private def setChar(line: Array[Int], lineColor: Array[Long], x: Int, c: Int) {
     if (FontUtils.wcwidth(c) > 1 && x >= line.length - 1) {
       // Don't allow setting wide chars in right-most col.
       return
@@ -260,9 +268,11 @@ class TextBuffer(var width: Int, var height: Int, initialFormat: PackedColor.Col
   }
 
   def load(nbt: NBTTagCompound): Unit = {
-    val maxResolution = math.max(Settings.screenResolutionsByTier.last._1, Settings.screenResolutionsByTier.last._2)
+    val maxResolution = Settings.screenResolutionsByTier.flatMap(r => Array(r._1, r._2)).max
     val w = nbt.getInteger("width") min maxResolution max 1
     val h = nbt.getInteger("height") min maxResolution max 1
+    if (w.toLong * h > math.max(25600, Settings.screenResolutionsByTier.map(r => r._1 * r._2).max * 2))
+      throw new IllegalArgumentException("text buffer area exceeds limit")
     size = (w, h)
 
     val b = nbt.getTagList("buffer", NBT.TAG_STRING)
@@ -279,11 +289,25 @@ class TextBuffer(var width: Int, var height: Int, initialFormat: PackedColor.Col
     val depth = api.internal.TextBuffer.ColorDepth.values.apply(nbt.getInteger("depth") min (api.internal.TextBuffer.ColorDepth.values.length - 1) max 0)
     _format = PackedColor.Depth.format(depth)
     _format.load(nbt)
-    foreground = PackedColor.Color(nbt.getInteger("foreground"), nbt.getBoolean("foregroundIsPalette"))
-    background = PackedColor.Color(nbt.getInteger("background"), nbt.getBoolean("backgroundIsPalette"))
+    val rgba = depth == api.internal.TextBuffer.ColorDepth.ThirtyTwoBit
+    foreground = PackedColor.Color(nbt.getInteger("foreground"), nbt.getBoolean("foregroundIsPalette"), if (rgba && nbt.hasKey("ocppForegroundAlpha")) nbt.getInteger("ocppForegroundAlpha") else 255)
+    background = PackedColor.Color(nbt.getInteger("background"), nbt.getBoolean("backgroundIsPalette"), if (rgba && nbt.hasKey("ocppBackgroundAlpha")) nbt.getInteger("ocppBackgroundAlpha") else 255)
 
-    if (!NbtDataStream.getShortArray(nbt, "colors", color, w, h)) {
-      NbtDataStream.getIntArrayLegacy(nbt, "color", color, w, h)
+    if (PackedColor.Depth.bits(depth) > 8) {
+      val bytes = nbt.getByteArray("ocppColors64")
+      if (nbt.getInteger("ocppColorVersion") != 1 || bytes.length != w * h * 8)
+        throw new IllegalArgumentException("invalid wide colour payload")
+      val input = new java.io.DataInputStream(new java.io.ByteArrayInputStream(bytes))
+      for (y <- 0 until h; x <- 0 until w) color(y)(x) = input.readLong()
+    }
+    else {
+      val initialLegacy = ((PackedColor.extractForeground(packed) << 8) | PackedColor.extractBackground(packed)).toShort
+      val legacy = Array.fill(h, w)(initialLegacy)
+      if (!NbtDataStream.getShortArray(nbt, "colors", legacy, w, h)) NbtDataStream.getIntArrayLegacy(nbt, "color", legacy, w, h)
+      for (y <- 0 until h; x <- 0 until w) {
+        val c = legacy(y)(x).toInt & 0xFFFF
+        color(y)(x) = ((c >>> 8).toLong << 32) | (c & 255).toLong
+      }
     }
   }
 
@@ -304,7 +328,16 @@ class TextBuffer(var width: Int, var height: Int, initialFormat: PackedColor.Col
     nbt.setInteger("background", _background.value)
     nbt.setBoolean("backgroundIsPalette", _background.isPalette)
 
-    NbtDataStream.setShortArray(nbt, "colors", color.flatten.map(_.toShort))
+    if (PackedColor.Depth.bits(_format.depth) > 8) {
+      val bytes = new java.io.ByteArrayOutputStream(width * height * 8)
+      val output = new java.io.DataOutputStream(bytes)
+      color.foreach(_.foreach(c => output.writeLong(c)))
+      nbt.setInteger("ocppColorVersion", 1)
+      nbt.setByteArray("ocppColors64", bytes.toByteArray)
+      nbt.setInteger("ocppForegroundAlpha", _foreground.alpha)
+      nbt.setInteger("ocppBackgroundAlpha", _background.alpha)
+    }
+    else NbtDataStream.setShortArray(nbt, "colors", color.flatten.map(c => ((PackedColor.extractForeground(c) << 8) | PackedColor.extractBackground(c)).toShort))
   }
 
   def lineToString(y: Int): String = {

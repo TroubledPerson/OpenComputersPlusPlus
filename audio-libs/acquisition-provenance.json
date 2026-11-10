@@ -1,0 +1,34 @@
+[
+  {
+    "file": "jlayer-1.0.1.jar",
+    "url": "https://repo.maven.apache.org/maven2/javazoom/jlayer/1.0.1/jlayer-1.0.1.jar",
+    "bytes": 143624,
+    "sha256": "850508c837454a1b06017c32a36876fae516de1e89a829f725fee1e6dcc52000",
+    "repositorySha1": "2bfef7a5a4c9af2184ff74b460b6d7d24349b98a",
+    "signatureVerified": false
+  },
+  {
+    "file": "jlayer-1.0.1-sources.jar",
+    "url": "https://repo.maven.apache.org/maven2/javazoom/jlayer/1.0.1/jlayer-1.0.1-sources.jar",
+    "bytes": 135125,
+    "sha256": "ecde410fc8940ab5d8d5a1d5c585870a3a194f4001701e66a27b8dd8cb7b75ce",
+    "repositorySha1": "4e727b40356f53930966addf6a23cb5f045ec8e1",
+    "signatureVerified": false
+  },
+  {
+    "file": "jlayer-1.0.1.pom",
+    "url": "https://repo.maven.apache.org/maven2/javazoom/jlayer/1.0.1/jlayer-1.0.1.pom",
+    "bytes": 3981,
+    "sha256": "9446b97a9756af75e825cbc078c803e673a7c319ad7ca8b65f3aa9ef155d5c3a",
+    "repositorySha1": "69b288a8900b1ee86abaa669e48026126b09256f",
+    "signatureVerified": false
+  },
+  {
+    "file": "nayuki-flac-e807ab25-source.zip",
+    "url": "https://codeload.github.com/nayuki/FLAC-library-Java/zip/e807ab25e28a3759ac82e119a406490f8e336b9b",
+    "bytes": 87030,
+    "sha256": "ab27360b1dc9800ee869b08d7397b226bd53684166f511aa9214f696af5aab90",
+    "repositorySha1": null,
+    "signatureVerified": false
+  }
+]

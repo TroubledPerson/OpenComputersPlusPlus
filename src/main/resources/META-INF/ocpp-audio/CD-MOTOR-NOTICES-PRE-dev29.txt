@@ -1,0 +1,16 @@
+OpenComputers++ CD motor loop - separate audio asset licence
+
+Approved source: Cd rom reading cd, supersnd (Freesound), freesound_community.
+https://pixabay.com/sound-effects/technology-cd-rom-reading-cd-70282/
+Original SHA256: 1df86c01f3e54c71c4c5b79100df21140d36b847d1f55bece17ba3dd42ec8b5b
+Pixabay Content License: https://pixabay.com/service/license-summary/
+This audio is not the mod's MIT code and is not a standalone sound collection.
+
+The dev.28 loop uses source seconds 7.0-8.5, gain 1.75 and a 100 ms equal-power
+tail/head blend, producing a 1.4-second mono 22050 Hz Vorbis cached loop. Its
+measured spectral balance and level are closer to the accepted startup ending.
+The startup and seek assets were not regenerated. Previous loop bytes/provenance
+remain preserved in earlier releases and verification backups.
+
+No independent listening, Minecraft or audio-device test was performed. Numeric
+qualification does not establish audible loop quality or native playback seams.

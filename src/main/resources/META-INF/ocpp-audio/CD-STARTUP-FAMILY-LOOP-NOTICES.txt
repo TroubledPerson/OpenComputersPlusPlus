@@ -1,0 +1,6 @@
+PS_Mechanical_BluRay_Spin_Up_01 by Marcus Dellicompagni / PoundSoundUK
+https://freesound.org/people/PoundSoundUK/sounds/718390/
+CC BY4.0 https://creativecommons.org/licenses/by/4.0/
+
+Owner-approved startup-family steady-loop excerpt from source 718390 at 5.55-7.95 seconds replaces the previous loop. Startup/read/refined-stop and preferred tray assets are unchanged from dev29. Only mono96kHz PCM16 to mono44.1kHz Vorbis quality5 conversion is applied to the new loop; no additional creative pitch, filtering, normalization or crossfade treatment. Earlier source separation and refined-stop beginning trim of0.191333s remain disclosed.
+Audio remains separately licensed from mod code MIT; no endorsement implied. Original source/sequence notices retained.

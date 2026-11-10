@@ -94,5 +94,10 @@ object PacketType extends Enumeration {
   RobotStateRequest,
   ServerPower,
 
+  TextBufferMultiColorAlphaChange,
+  OcppAudio, // Server -> Client only. Append to retain every older ordinal.
+  OcppOpticalSound, // Fixed CD-drive event IDs; append-only, no resource paths.
+  OcppPreviewPower, // Client -> Server, bounded simulation only; append-only.
+  OcppOpticalMotor, // Server -> Client, fixed motor state/epoch/sequence; append-only.
   EndOfList = Value
 }

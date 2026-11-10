@@ -58,7 +58,7 @@ abstract class TextureFontRenderer {
       var cbg = 0x000000
       var x = 0
       var width = 0
-      for (col <- color.map(PackedColor.unpackBackground(_, format)) if x + width < viewportWidth) {
+      for (col <- color.map(PackedColor.renderBackground(_, format)) if x + width < viewportWidth) {
         if (col != cbg) {
           drawQuad(cbg, x, y, width)
           cbg = col
@@ -92,7 +92,7 @@ abstract class TextureFontRenderer {
         var tx = 0f
         for (n <- 0 until viewportWidth) {
           val ch = line(n)
-          val col = PackedColor.unpackForeground(color(n), format)
+          val col = PackedColor.renderForeground(color(n), format)
           // Check if color changed.
           if (col != cfg) {
             cfg = col

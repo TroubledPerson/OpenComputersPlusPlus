@@ -5,5 +5,5 @@ class GraphicsCard(val parent: Delegator, val tier: Int) extends traits.Delegate
 
   override def gpuTier = tier
 
-  override protected def tooltipName = Option(super.unlocalizedName)
+  override protected def tooltipName = Option(if (tier >= 4 && tier <= 6) "graphicscardextended" else super.unlocalizedName)
 }

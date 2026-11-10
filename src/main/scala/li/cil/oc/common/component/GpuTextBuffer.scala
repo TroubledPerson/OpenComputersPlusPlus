@@ -11,6 +11,7 @@ import li.cil.oc.api
 import li.cil.oc.common.component.traits.{TextBufferProxy, VideoRamDevice, VideoRamRasterizer}
 
 class GpuTextBuffer(val owner: String, val id: Int, val data: li.cil.oc.util.TextBuffer) extends traits.TextBufferProxy {
+  private var maximumColorDepth = data.format.depth
 
   // the gpu ram does not join nor is searchable to the network
   // this field is required because the api TextBuffer is an Environment
@@ -21,23 +22,34 @@ class GpuTextBuffer(val owner: String, val id: Int, val data: li.cil.oc.util.Tex
 
   override def getMaximumWidth: Int = data.width
   override def getMaximumHeight: Int = data.height
-  override def getViewportWidth: Int = data.height
-  override def getViewportHeight: Int = data.width
+  override def getViewportWidth: Int = data.width
+  override def getViewportHeight: Int = data.height
 
   var dirty: Boolean = true
   override def onBufferSet(col: Int, row: Int, s: String, vertical: Boolean): Unit = dirty = true
   override def onBufferColorChange(): Unit = dirty = true
   override def onBufferCopy(col: Int, row: Int, w: Int, h: Int, tx: Int, ty: Int): Unit = dirty = true
   override def onBufferFill(col: Int, row: Int, w: Int, h: Int, c: Int): Unit = dirty = true
+  override def onBufferPaletteChange(index: Int): Unit = dirty = true
+  override def setColorDepth(depth: ColorDepth): Boolean = {
+    val changed = super.setColorDepth(depth)
+    if (changed) dirty = true
+    changed
+  }
+  override def rawSetText(col: Int, row: Int, text: Array[Array[Int]]): Unit = { super.rawSetText(col, row, text); dirty = true }
+  override def rawSetForeground(col: Int, row: Int, colors: Array[Array[Int]]): Unit = { super.rawSetForeground(col, row, colors); dirty = true }
+  override def rawSetBackground(col: Int, row: Int, colors: Array[Array[Int]]): Unit = { super.rawSetBackground(col, row, colors); dirty = true }
 
   override def load(nbt: NBTTagCompound): Unit = {
     // the data is initially dirty because other devices don't know about it yet
     data.load(nbt)
+    if (nbt.hasKey("ocppMaximumDepth")) maximumColorDepth = ColorDepth.values.apply(nbt.getInteger("ocppMaximumDepth") max data.format.depth.ordinal min 5)
     dirty = true
   }
 
   override def save(nbt: NBTTagCompound): Unit = {
     data.save(nbt)
+    nbt.setInteger("ocppMaximumDepth", maximumColorDepth.ordinal)
     dirty = false
   }
 
@@ -50,8 +62,12 @@ class GpuTextBuffer(val owner: String, val id: Int, val data: li.cil.oc.util.Tex
   override def getAspectRatio: Double = 1
   override def setResolution(width: Int, height: Int): Boolean = false
   override def setViewport(width: Int, height: Int): Boolean = false
-  override def setMaximumColorDepth(depth: ColorDepth): Unit = {}
-  override def getMaximumColorDepth: ColorDepth = data.format.depth
+  override def setMaximumColorDepth(depth: ColorDepth): Unit = {
+    if (data.format.depth.ordinal > depth.ordinal) data.format = li.cil.oc.util.PackedColor.Depth.format(depth)
+    maximumColorDepth = depth
+    dirty = true
+  }
+  override def getMaximumColorDepth: ColorDepth = maximumColorDepth
   override def renderText: Boolean = false
   override def renderWidth: Int = 0
   override def renderHeight: Int = 0

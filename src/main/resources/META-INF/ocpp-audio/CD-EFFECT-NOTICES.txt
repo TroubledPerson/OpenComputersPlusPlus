@@ -1,0 +1,13 @@
+OpenComputers++ CD-drive audio: Pixabay Content License, not the mod's MIT license.
+Tray: DVD Player Open and Close, tohubohu, asset605300,18September2026.
+https://pixabay.com/sound-effects/film-special-effects-dvd-player-open-and-close-605300/
+Reading: Cd rom reading cd, supersnd(Freesound)/freesound_community,70282,21July2022.
+https://pixabay.com/sound-effects/technology-cd-rom-reading-cd-70282/
+License and terms: https://pixabay.com/service/license-summary/
+https://pixabay.com/service/terms/
+Integrated adapted game effects only; no standalone source-sound redistribution.
+Source/derived hashes and trim/codec/fade/loudness details are recorded in
+assets/opencomputers/sounds/ocpp/cd-effects-provenance.json. Owner-local originals
+remain outside distribution and unchanged. Attribution retained voluntarily.
+No101soundboards or alternate99629 clips included. No third-party-rights guarantee.
+FFmpeg is an existing GPLv3 build tool and is not shipped as a mod dependency.

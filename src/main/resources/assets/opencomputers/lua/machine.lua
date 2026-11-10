@@ -1489,6 +1489,23 @@ sandbox.unicode = libunicode
 
 -------------------------------------------------------------------------------
 
+-- OC++ optical readiness gate: simulation, not audio or hardware completion.
+local function waitForOpticalMedia()
+  local untilTime = computer.uptime() + 6
+  while computer.uptime() < untilTime do
+    local pending, count = false, 0
+    for address in libcomponent.list("cd_drive") do
+      count = count + 1
+      if count > 256 then return end
+      local ok, state = pcall(libcomponent.invoke, address, "getReadyState")
+      if ok and state == "starting" then pending = true end
+    end
+    if not pending then return end
+    coroutine.yield(0.05)
+  end
+end
+-- End OC++ optical readiness gate.
+
 local function bootstrap()
   local eeprom = libcomponent.list("eeprom")()
   if eeprom then
@@ -1496,7 +1513,7 @@ local function bootstrap()
     if code and #code > 0 then
       local bios, reason = load(code, "=bios", "t", sandbox)
       if bios then
-        return coroutine.create(bios), {n=0}
+        return coroutine.create(function() waitForOpticalMedia(); return bios() end), {n=0}
       end
       error("failed loading bios: " .. reason, 0)
     end

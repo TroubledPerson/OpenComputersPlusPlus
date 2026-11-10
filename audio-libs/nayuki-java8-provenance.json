@@ -1,0 +1,10 @@
+{
+  "source": "https://github.com/nayuki/FLAC-library-Java",
+  "revision": "c9b8727bab49f6da15f47c21bb67ef6de0306cad",
+  "selection": "parent of official Java14 syntax-only commit; original e807 archive/source retained",
+  "bytes": 87021,
+  "extractedBytes": 184960,
+  "sha256": "a6e3e31bdd5eaa663e11752ecf088f199c3ab0c5bc945939c49f897ef43ec597",
+  "signatureVerified": false,
+  "noCodecExecuted": true
+}

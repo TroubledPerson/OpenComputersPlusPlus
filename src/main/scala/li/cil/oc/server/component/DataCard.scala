@@ -6,7 +6,6 @@ import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.util
 import java.util.zip.DeflaterOutputStream
-import java.util.zip.InflaterOutputStream
 import javax.crypto.Cipher
 import javax.crypto.KeyAgreement
 import javax.crypto.Mac
@@ -17,6 +16,7 @@ import com.google.common.hash.Hashing
 import li.cil.oc.api.driver.DeviceInfo.DeviceAttribute
 import li.cil.oc.api.driver.DeviceInfo.DeviceClass
 import li.cil.oc.Settings
+import li.cil.oc.plusplus.BoundedCompression
 import li.cil.oc.api.Network
 import li.cil.oc.api.driver.DeviceInfo
 import li.cil.oc.api.machine.Arguments
@@ -111,12 +111,11 @@ object DataCard {
     @Callback(direct = true, limit = 4, doc = """function(data:string):string -- Applies inflate decompression to the data.""")
     def inflate(context: Context, args: Arguments): Array[AnyRef] = {
       val data = complexCost(context, args)
-      val baos = new ByteArrayOutputStream(512)
-      val inos = new InflaterOutputStream(baos)
-      inos.write(data)
-      inos.finish()
-      result(baos.toByteArray)
+      result(BoundedCompression.inflate(data, Settings.get.dataCardInflateLimit))
     }
+
+    @Callback(direct = true, doc = """function():number -- Maximum decompressed output bytes; independent of the input limit.""")
+    def getInflateLimit(context: Context, args: Arguments): Array[AnyRef] = result(Settings.get.dataCardInflateLimit)
 
     @Callback(direct = true, limit = 32, doc = """function(data:string):string -- Computes CRC-32 hash of the data. Result is binary data.""")
     def crc32(context: Context, args: Arguments): Array[AnyRef] = {

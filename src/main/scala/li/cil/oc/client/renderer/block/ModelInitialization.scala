@@ -155,6 +155,10 @@ object ModelInitialization {
       Constants.BlockName.ScreenTier1 -> (_ => ScreenModel),
       Constants.BlockName.ScreenTier2 -> (_ => ScreenModel),
       Constants.BlockName.ScreenTier3 -> (_ => ScreenModel),
+      "ocpp_screen4" -> (_ => ScreenModel),
+      "ocpp_screen5" -> (_ => ScreenModel),
+      "ocpp_screen6" -> (_ => ScreenModel),
+      "ocpp_screen7_preview" -> (_ => VMScreenPreviewModel),
       Constants.BlockName.Rack -> (parent => new ServerRackModel(parent))
     )
 

@@ -37,6 +37,7 @@ class Case(val tier: Int) extends RedstoneAware with traits.PowerAcceptor with t
     case 0 => "2/1/1"
     case 1 => "2/2/2"
     case 2 | 3 => "3/2/3"
+    case 4 | 5 | 6 => "3/2/3"
     case _ => "0/0/0"
   }
 

@@ -4,6 +4,8 @@ import li.cil.oc.Constants
 import li.cil.oc.api
 import li.cil.oc.api.internal.Colored
 import li.cil.oc.common.block
+import li.cil.oc.common.item
+import li.cil.oc.common.item.Delegator
 import li.cil.oc.util.Color
 import li.cil.oc.util.ItemColorizer
 import li.cil.oc.util.ItemUtils
@@ -36,6 +38,9 @@ object ColorHandler {
       api.Items.get(Constants.BlockName.CaseTier1).block(),
       api.Items.get(Constants.BlockName.CaseTier2).block(),
       api.Items.get(Constants.BlockName.CaseTier3).block(),
+      api.Items.get("ocpp_case4").block(),
+      api.Items.get("ocpp_case5").block(),
+      api.Items.get("ocpp_case6").block(),
       api.Items.get(Constants.BlockName.CaseCreative).block())
 
     register((state, world, pos, tintIndex) => Color.rgbValues(Color.byOreName(Color.dyes(state.getBlock.getMetaFromState(state) max 0 min Color.dyes.length))),
@@ -50,7 +55,8 @@ object ColorHandler {
     },
       api.Items.get(Constants.BlockName.ScreenTier1).block(),
       api.Items.get(Constants.BlockName.ScreenTier2).block(),
-      api.Items.get(Constants.BlockName.ScreenTier3).block())
+      api.Items.get(Constants.BlockName.ScreenTier3).block(),
+      api.Items.get("ocpp_screen4").block(), api.Items.get("ocpp_screen5").block(), api.Items.get("ocpp_screen6").block())
 
     register((stack, tintIndex) => if (ItemColorizer.hasColor(stack)) ItemColorizer.getColor(stack) else tintIndex,
       Item.getItemFromBlock(api.Items.get(Constants.BlockName.Cable).block()))
@@ -59,6 +65,9 @@ object ColorHandler {
       Item.getItemFromBlock(api.Items.get(Constants.BlockName.CaseTier1).block()),
       Item.getItemFromBlock(api.Items.get(Constants.BlockName.CaseTier2).block()),
       Item.getItemFromBlock(api.Items.get(Constants.BlockName.CaseTier3).block()),
+      Item.getItemFromBlock(api.Items.get("ocpp_case4").block()),
+      Item.getItemFromBlock(api.Items.get("ocpp_case5").block()),
+      Item.getItemFromBlock(api.Items.get("ocpp_case6").block()),
       Item.getItemFromBlock(api.Items.get(Constants.BlockName.CaseCreative).block()))
 
     register((stack, tintIndex) => Color.rgbValues(EnumDyeColor.byDyeDamage(stack.getItemDamage)),
@@ -68,6 +77,9 @@ object ColorHandler {
       Item.getItemFromBlock(api.Items.get(Constants.BlockName.ScreenTier1).block()),
       Item.getItemFromBlock(api.Items.get(Constants.BlockName.ScreenTier2).block()),
       Item.getItemFromBlock(api.Items.get(Constants.BlockName.ScreenTier3).block()),
+      Item.getItemFromBlock(api.Items.get("ocpp_screen4").block()),
+      Item.getItemFromBlock(api.Items.get("ocpp_screen5").block()),
+      Item.getItemFromBlock(api.Items.get("ocpp_screen6").block()),
       Item.getItemFromBlock(api.Items.get(Constants.BlockName.Print).block()),
       Item.getItemFromBlock(api.Items.get(Constants.BlockName.Robot).block()))
 
@@ -76,6 +88,22 @@ object ColorHandler {
         if (ItemColorizer.hasColor(stack)) ItemColorizer.getColor(stack) else 0x66DD55
       } else 0xFFFFFF,
       api.Items.get(Constants.ItemName.HoverBoots).item())
+
+    // Original hardware stays untinted. Only generated rim/mark layer one has a tier colour.
+    register((stack, tintIndex) => {
+      if (Delegator.subItem(stack).exists(_.isInstanceOf[item.OpticalDisc])) 0xFFFFFF
+      else {
+      val tier = Delegator.subItem(stack) match {
+        case Some(cpu: item.CPU) => cpu.cpuTier
+        case Some(apu: item.ExtendedAPU) => apu.cpuTier
+        case Some(gpu: item.GraphicsCard) => gpu.gpuTier
+        case Some(ram: item.Memory) => li.cil.oc.plusplus.TierProfiles.memoryTier(ram.tier)
+        case Some(hdd: item.HardDiskDrive) => hdd.tier
+        case _ => 0
+      }
+      li.cil.oc.plusplus.TierSpriteLayers.layerTint(tintIndex, Color.rgbValues(Color.byTier(tier)))
+      }
+    }, api.Items.get("ocpp_cpu4").item())
   }
 
   def register(handler: (IBlockState, IBlockAccess, BlockPos, Int) => Int, blocks: Block*): Unit = {

@@ -1,0 +1,6 @@
+PS_Mechanical_BluRay_Spin_Up_01 by Marcus Dellicompagni / PoundSoundUK
+https://freesound.org/people/PoundSoundUK/sounds/718390/
+CC BY4.0 https://creativecommons.org/licenses/by/4.0/
+
+Owner-selected B brief single tick replaces the shared read/seek/successful-write cue. Selected WAV is source718390 at10.550-10.665s, producer-applied-3dB and12ms/35ms half-cosine fades; no EQ, denoise or compression. Necessary game conversion uses an equal-weight channel average and folds stereo96kHz PCM16 to positional mono44.1kHz Vorbis quality5 without further creative treatment. Approved2.51s startup,2.4s loop, recorded natural stop and preferred tray asset bytes remain unchanged from dev31. Runtime tray gain changes0.50 to0.75. Earlier source excerpts and refined-stop trim0.191333s remain disclosed.
+CC BY audio is separate from mod code MIT; no endorsement implied. Full original recording was not acquired here. No rejected A/C or muffled click is used.

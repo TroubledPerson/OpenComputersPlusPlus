@@ -1,0 +1,13 @@
+# Bounded sound cards, one output. Normal T1-T3 chips, not extended tier shells.
+ocpp_sound1 {
+  input: [["redstone","oc:circuitChip1","redstone"],["","oc:materialCard",""]]
+  output: 1
+}
+ocpp_sound2 {
+  input: [["oc:circuitChip2","minecraft:noteblock","oc:circuitChip2"],["","oc:materialCard",""]]
+  output: 1
+}
+ocpp_sound3 {
+  input: [["oc:circuitChip3","oc:materialALU","oc:circuitChip3"],["minecraft:noteblock","oc:materialCard","gemQuartz"]]
+  output: 1
+}

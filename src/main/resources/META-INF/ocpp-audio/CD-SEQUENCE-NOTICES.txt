@@ -1,0 +1,9 @@
+PS_Mechanical_BluRay_Spin_Up_01 by Marcus Dellicompagni / PoundSoundUK
+Source: https://freesound.org/people/PoundSoundUK/sounds/718390/
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+https://creativecommons.org/licenses/by/4.0/legalcode
+
+Owner-approved separated spin-up, steady-loop and read-event excerpts; refined stop has an additional 0.191333 s beginning trim. This release only resamples 96 kHz mono PCM16 to 44.1 kHz and encodes Vorbis quality 5; no further creative filtering, EQ, gain normalization or pitch treatment.
+
+These audio assets are CC BY 4.0, separate from the mod code MIT license. No endorsement is implied. Existing Pixabay tray/open/close/read reference notices remain separately applicable; those assets are unchanged.

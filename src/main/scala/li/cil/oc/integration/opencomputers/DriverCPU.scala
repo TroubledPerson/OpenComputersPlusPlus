@@ -22,9 +22,12 @@ abstract class DriverCPU extends Item with api.driver.item.MutableProcessor with
   override def worksWith(stack: ItemStack) = isOneOf(stack,
     api.Items.get(Constants.ItemName.CPUTier1),
     api.Items.get(Constants.ItemName.CPUTier2),
-    api.Items.get(Constants.ItemName.CPUTier3))
+    api.Items.get(Constants.ItemName.CPUTier3),
+    api.Items.get("ocpp_cpu4"),
+    api.Items.get("ocpp_cpu5"),
+    api.Items.get("ocpp_cpu6"))
 
-  override def createEnvironment(stack: ItemStack, host: api.network.EnvironmentHost): api.network.ManagedEnvironment = new component.CPU(tier(stack))
+  override def createEnvironment(stack: ItemStack, host: api.network.EnvironmentHost): api.network.ManagedEnvironment = component.CPU.create(tier(stack))
 
   override def slot(stack: ItemStack) = Slot.CPU
 
@@ -66,5 +69,5 @@ abstract class DriverCPU extends Item with api.driver.item.MutableProcessor with
     stack.getTagCompound.setString(Settings.namespace + "archName", api.Machine.getArchitectureName(architecture))
   }
 
-  override def getCallBudget(stack: ItemStack): Double = Settings.get.callBudgets(tier(stack) max Tier.One min Tier.Three)
+  override def getCallBudget(stack: ItemStack): Double = Settings.get.callBudgets(tier(stack) max Tier.One min (Settings.get.callBudgets.length - 1))
 }

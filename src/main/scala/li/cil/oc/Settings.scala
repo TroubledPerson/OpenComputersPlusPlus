@@ -6,6 +6,7 @@ import com.typesafe.config._
 import com.typesafe.config.impl.OpenComputersConfigCommentManipulationHook
 import li.cil.oc.Settings.DebugCardAccess
 import li.cil.oc.common.Tier
+import li.cil.oc.plusplus.TierProfiles
 import li.cil.oc.server.component.DebugCard
 import li.cil.oc.server.component.DebugCard.AccessContext
 import li.cil.oc.util.{InetAddressRange, InternetFilteringRule}
@@ -27,6 +28,9 @@ import scala.io.{Codec, Source}
 import scala.util.matching.Regex
 
 class Settings(val config: Config) {
+  private val ocppWidths = TierProfiles.checked(config.getIntList("plusplus.screenWidths").map(_.intValue()).toArray, 1, 480)
+  private val ocppHeights = TierProfiles.checked(config.getIntList("plusplus.screenHeights").map(_.intValue()).toArray, 1, 150)
+  val ocppScreenResolutions = Array((50, 16), (80, 25), (160, 50), (160, 50)) ++ ocppWidths.zip(ocppHeights)
   // ----------------------------------------------------------------------- //
   // client
   val screenTextFadeStartDistance = config.getDouble("client.screenTextFadeStartDistance")
@@ -61,20 +65,22 @@ class Settings(val config: Config) {
   val startupDelay = config.getDouble("computer.startupDelay") max 0.05
   val eepromSize = config.getInt("computer.eepromSize") max 0
   val eepromDataSize = config.getInt("computer.eepromDataSize") max 0
-  val cpuComponentSupport = Array(config.getIntList("computer.cpuComponentCount"): _*) match {
+  private val legacyCpuComponentSupport = Array(config.getIntList("computer.cpuComponentCount"): _*) match {
     case Array(tier1, tier2, tier3, tierCreative) =>
       Array(tier1: Int, tier2: Int, tier3: Int, tierCreative: Int)
     case _ =>
       OpenComputers.log.warn("Bad number of CPU component counts, ignoring.")
       Array(8, 12, 16, 1024)
   }
-  val callBudgets = Array(config.getDoubleList("computer.callBudgets"): _*) match {
+  val cpuComponentSupport = legacyCpuComponentSupport ++ TierProfiles.checked(config.getIntList("plusplus.cpuComponentCount").map(_.intValue()).toArray, 1, 256)
+  private val legacyCallBudgets = Array(config.getDoubleList("computer.callBudgets"): _*) match {
     case Array(tier1, tier2, tier3) =>
       Array(tier1: Double, tier2: Double, tier3: Double)
     case _ =>
       OpenComputers.log.warn("Bad number of call budgets, ignoring.")
       Array(0.5, 1.0, 1.5)
   }
+  val callBudgets = legacyCallBudgets ++ Array(legacyCallBudgets.last) ++ TierProfiles.checkedBudgets(config.getDoubleList("plusplus.callBudgets").map(_.doubleValue()).toArray)
   val canComputersBeOwned = config.getBoolean("computer.canComputersBeOwned")
   val maxUsers = config.getInt("computer.maxUsers") max 0
   val maxUsernameLength = config.getInt("computer.maxUsernameLength") max 0
@@ -87,14 +93,24 @@ class Settings(val config: Config) {
   val enableLua53 = config.getBoolean("computer.lua.enableLua53")
   val defaultLua53 = config.getBoolean("computer.lua.defaultLua53")
   val enableLua54 = config.getBoolean("computer.lua.enableLua54")
-  val ramSizes = Array(config.getIntList("computer.lua.ramSizes"): _*) match {
+  private val legacyRamSizes = Array(config.getIntList("computer.lua.ramSizes"): _*) match {
     case Array(tier1, tier2, tier3, tier4, tier5, tier6) =>
       Array(tier1: Int, tier2: Int, tier3: Int, tier4: Int, tier5: Int, tier6: Int)
     case _ =>
       OpenComputers.log.warn("Bad number of RAM sizes, ignoring.")
       Array(192, 256, 384, 512, 768, 1024)
   }
+  val ramSizes = TierProfiles.memorySizes(legacyRamSizes,
+    config.getIntList("plusplus.ramSizesKiB").map(_.intValue()).toArray,
+    config.getIntList("plusplus.halfRamSizesKiB").map(_.intValue()).toArray)
   val ramScaleFor64Bit = config.getDouble("computer.lua.ramScaleFor64Bit") max 1
+  val opticalCapacityBytes = (config.getInt("plusplus.cdCapacityKiB") max 1 min 131072).toLong * 1024
+  val soundCardsEnabled = config.getBoolean("plusplus.soundCardsEnabled")
+  val opticalAudioDiagnostics = config.getBoolean("plusplus.opticalAudioDiagnostics")
+  val soundMaxEncodedBytes = (config.getInt("plusplus.soundMaxEncodedKiB") max 1 min 8192) * 1024
+  val soundMaxDurationSeconds = config.getInt("plusplus.soundMaxDurationSeconds") max 1 min 60
+  val soundMaxServerStreams = config.getInt("plusplus.soundMaxServerStreams") max 1 min 8
+  val soundMaxQueuedNotes = config.getInt("plusplus.soundMaxQueuedNotes") max 1 min 32
   val maxTotalRam = config.getInt("computer.lua.maxTotalRam") max 0
 
   // ----------------------------------------------------------------------- //
@@ -244,7 +260,7 @@ class Settings(val config: Config) {
     case _ =>
       OpenComputers.log.warn("Bad number of computer case conversion rates, ignoring.")
       Array(5.0, 10.0, 20.0)
-  }) ++ Array(9001.0)
+  }) ++ Array(9001.0) ++ TierProfiles.checked(config.getIntList("plusplus.casePowerRates").map(_.intValue()).toArray, 1, 10000).map(_.toDouble)
   // Creative case.
   val chargerRate = config.getDouble("power.rate.charger") max 0
   val disassemblerRate = config.getDouble("power.rate.disassembler") max 0
@@ -278,20 +294,22 @@ class Settings(val config: Config) {
   // filesystem
   val fileCost = config.getInt("filesystem.fileCost") max 0
   val bufferChanges = config.getBoolean("filesystem.bufferChanges")
-  val hddSizes = Array(config.getIntList("filesystem.hddSizes"): _*) match {
+  private val legacyHddSizes = Array(config.getIntList("filesystem.hddSizes"): _*) match {
     case Array(tier1, tier2, tier3) =>
       Array(tier1: Int, tier2: Int, tier3: Int)
     case _ =>
       OpenComputers.log.warn("Bad number of HDD sizes, ignoring.")
       Array(1024, 2048, 4096)
   }
-  val hddPlatterCounts = Array(config.getIntList("filesystem.hddPlatterCounts"): _*) match {
+  val hddSizes = TierProfiles.diskSizes(legacyHddSizes, config.getIntList("plusplus.hddSizesKiB").map(_.intValue()).toArray)
+  private val legacyHddPlatterCounts = Array(config.getIntList("filesystem.hddPlatterCounts"): _*) match {
     case Array(tier1, tier2, tier3) =>
       Array(tier1: Int, tier2: Int, tier3: Int)
     case _ =>
       OpenComputers.log.warn("Bad number of HDD platter counts, ignoring.")
       Array(2, 4, 6)
   }
+  val hddPlatterCounts = legacyHddPlatterCounts ++ Array(legacyHddPlatterCounts.last, 8, 12, 16)
   val floppySize = config.getInt("filesystem.floppySize") max 0
   val tmpSize = config.getInt("filesystem.tmpSize") max 0
   val maxHandles = config.getInt("filesystem.maxHandles") max 0
@@ -384,6 +402,7 @@ class Settings(val config: Config) {
   val giveManualToNewPlayers = config.getBoolean("misc.giveManualToNewPlayers")
   val dataCardSoftLimit = config.getInt("misc.dataCardSoftLimit") max 0
   val dataCardHardLimit = config.getInt("misc.dataCardHardLimit") max 0
+  val dataCardInflateLimit = (if (config.hasPath("misc.dataCardInflateLimit")) config.getInt("misc.dataCardInflateLimit") else 8 * 1024 * 1024) max 0 min (64 * 1024 * 1024)
   val dataCardTimeout = config.getDouble("misc.dataCardTimeout") max 0
   val serverRackSwitchTier = (config.getInt("misc.serverRackSwitchTier") - 1) max Tier.None min Tier.Three
   val redstoneDelay = config.getDouble("misc.redstoneDelay") max 0
@@ -479,13 +498,14 @@ class Settings(val config: Config) {
   val maxSignalQueueSize: Int = (if (config.hasPath("computer.maxSignalQueueSize")) config.getInt("computer.maxSignalQueueSize") else 256) max 256
 
   // >= 1.7.6
-  val vramSizes: Array[Double] = Array(config.getDoubleList("gpu.vramSizes"): _*) match {
+  private val legacyVramSizes: Array[Double] = Array(config.getDoubleList("gpu.vramSizes"): _*) match {
     case Array(tier1, tier2, tier3) => Array(tier1: Double, tier2: Double, tier3: Double)
     case _ =>
       OpenComputers.log.warn("Bad number of VRAM sizes (expected 3), ignoring.")
       Array(1, 2, 3)
   }
 
+  val vramSizes: Array[Double] = legacyVramSizes ++ Array(legacyVramSizes.last) ++ TierProfiles.checked(config.getIntList("plusplus.vramPages").map(_.intValue()).toArray, 1, 2).map(_.toDouble)
   val bitbltCost: Double = if (config.hasPath("gpu.bitbltCost")) config.getDouble("gpu.bitbltCost") else 0.5
 
   // >= 1.8.2
@@ -518,8 +538,9 @@ object Settings {
   val namespace = "oc:"
   val savePath = "opencomputers/"
   val scriptPath: String = "/assets/" + resourceDomain + "/lua/"
-  val screenResolutionsByTier: Array[(Int, Int)] = Array((50, 16), (80, 25), (160, 50))
-  val screenDepthsByTier: Array[api.internal.TextBuffer.ColorDepth] = Array(api.internal.TextBuffer.ColorDepth.OneBit, api.internal.TextBuffer.ColorDepth.FourBit, api.internal.TextBuffer.ColorDepth.EightBit)
+  private val defaultScreenResolutions = Array((50, 16), (80, 25), (160, 50), (160, 50), (300, 90), (360, 113), (480, 150))
+  def screenResolutionsByTier: Array[(Int, Int)] = if (settings == null) defaultScreenResolutions else settings.ocppScreenResolutions
+  val screenDepthsByTier: Array[api.internal.TextBuffer.ColorDepth] = Array(api.internal.TextBuffer.ColorDepth.OneBit, api.internal.TextBuffer.ColorDepth.FourBit, api.internal.TextBuffer.ColorDepth.EightBit, api.internal.TextBuffer.ColorDepth.EightBit, api.internal.TextBuffer.ColorDepth.SixteenBit, api.internal.TextBuffer.ColorDepth.TwentyFourBit, api.internal.TextBuffer.ColorDepth.ThirtyTwoBit)
   val deviceComplexityByTier: Array[Int] = Array(12, 24, 32, 9001)
   var rTreeDebugRenderer = false
   var blockRenderId: Int = -1

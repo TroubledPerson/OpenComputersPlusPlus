@@ -133,7 +133,12 @@ object PacketSender {
   // Avoid spamming the network with disk activity notices.
   private val fileSystemAccessTimeouts = mutable.WeakHashMap.empty[Node, Cache[String, java.lang.Long]]
 
-  def sendFileSystemActivity(node: Node, host: EnvironmentHost, name: String) = {
+  def sendFileSystemActivity(node: Node, host: EnvironmentHost, name: String): Unit = {
+    host match {
+      case tile: net.minecraft.tileentity.TileEntity if li.cil.oc.common.event.FileSystemAccessHandler.isLegacyOpticalSound(tile, name) =>
+        return // Dedicated optical read scheduling owns this host; no legacy packet/event.
+      case _ =>
+    }
     val diskActivityPacketDelay = Settings.get.diskActivitySoundDelay
 
     if (diskActivityPacketDelay >= 0) {
@@ -605,12 +610,7 @@ object PacketSender {
   }
 
   def appendTextBufferColorChange(pb: PacketBuilder, foreground: PackedColor.Color, background: PackedColor.Color) {
-    pb.writePacketType(PacketType.TextBufferMultiColorChange)
-
-    pb.writeInt(foreground.value)
-    pb.writeBoolean(foreground.isPalette)
-    pb.writeInt(background.value)
-    pb.writeBoolean(background.isPalette)
+    ColorBrushPacket.write(pb, foreground, background)
   }
 
   def appendTextBufferCopy(pb: PacketBuilder, col: Int, row: Int, w: Int, h: Int, tx: Int, ty: Int) {
@@ -802,6 +802,26 @@ object PacketSender {
     pb.writeShort(duration.toShort)
 
     pb.sendToNearbyPlayers(world, x, y, z, Option(Settings.get.maxNetworkClientSoundPacketDistance))
+  }
+
+  private def cardPacket(host: EnvironmentHost,key: String,token: Long,action: Int): SimplePacketBuilder = {
+    val p=new SimplePacketBuilder(PacketType.OcppAudio)
+    p.writeInt(host.world.provider.getDimension);p.writeDouble(host.xPosition);p.writeDouble(host.yPosition);p.writeDouble(host.zPosition)
+    p.writeUTF(key);p.writeLong(token);p.writeByte(action);p
+  }
+  private def sendCard(host: EnvironmentHost,p: SimplePacketBuilder): Unit =
+    p.sendToNearbyPlayers(host.world,host.xPosition,host.yPosition,host.zPosition,Option(Settings.get.maxNetworkClientSoundPacketDistance))
+  def sendCardAudio(host: EnvironmentHost,key: String,token: Long,action: Int,format: String="",length: Int=0,seconds: Int=0,volume: Float=1f): Unit = {
+    val p=cardPacket(host,key,token,action)
+    if(action==0){p.writeUTF(format);p.writeInt(length);p.writeByte(seconds);p.writeFloat(volume)}
+    sendCard(host,p)
+  }
+  def sendCardAudioData(host: EnvironmentHost,key: String,token: Long,offset: Int,data: Array[Byte]): Unit = {
+    require(data.nonEmpty && data.length<=8192)
+    val p=cardPacket(host,key,token,1);p.writeInt(offset);p.writeShort(data.length);p.write(data);sendCard(host,p)
+  }
+  def sendCardTone(host: EnvironmentHost,key: String,token: Long,wave: Int,hz: Int,ms: Int,volume: Float): Unit = {
+    val p=cardPacket(host,key,token,4);p.writeByte(wave);p.writeShort(hz);p.writeShort(ms);p.writeFloat(volume);sendCard(host,p)
   }
 
   def sendSound(world: World, x: Double, y: Double, z: Double, pattern: String) {

@@ -48,6 +48,14 @@ trait TextBufferProxy extends api.internal.TextBuffer {
 
   override def getForegroundColor: Int = data.foreground.value
 
+  override def setForegroundColorRGBA(rgb: Int, alpha: Int): Unit = {
+    if (getColorDepth != TextBuffer.ColorDepth.ThirtyTwoBit) throw new IllegalArgumentException("RGBA requires 32-bit mode")
+    data.foreground = PackedColor.Color(rgb & 0xFFFFFF, false, alpha)
+    onBufferColorChange()
+  }
+  override def getForegroundAlpha: Int = data.foreground.alpha
+  override def getForegroundAlpha(column: Int, row: Int): Int = data.format.alpha(PackedColor.extractForeground(color(column, row)))
+
   override def isForegroundFromPalette: Boolean = data.foreground.isPalette
 
   override def setBackgroundColor(color: Int): Unit = setBackgroundColor(color, isFromPalette = false)
@@ -61,6 +69,14 @@ trait TextBufferProxy extends api.internal.TextBuffer {
   }
 
   override def getBackgroundColor: Int = data.background.value
+
+  override def setBackgroundColorRGBA(rgb: Int, alpha: Int): Unit = {
+    if (getColorDepth != TextBuffer.ColorDepth.ThirtyTwoBit) throw new IllegalArgumentException("RGBA requires 32-bit mode")
+    data.background = PackedColor.Color(rgb & 0xFFFFFF, false, alpha)
+    onBufferColorChange()
+  }
+  override def getBackgroundAlpha: Int = data.background.alpha
+  override def getBackgroundAlpha(column: Int, row: Int): Int = data.format.alpha(PackedColor.extractBackground(color(column, row)))
 
   override def isBackgroundFromPalette: Boolean = data.background.isPalette
 
@@ -152,9 +168,8 @@ trait TextBufferProxy extends api.internal.TextBuffer {
     for (y <- row until ((row + color.length) min data.height)) {
       val line = color(y - row)
       for (x <- col until ((col + line.length) min data.width)) {
-        val packedBackground = data.color(y)(x) & 0x00FF
-        val packedForeground = (data.format.deflate(PackedColor.Color(line(x - col))) << PackedColor.ForegroundShift) & 0xFF00
-        data.color(y)(x) = (packedForeground | packedBackground).toShort
+          val background = PackedColor.backgroundColor(data.color(y)(x), data.format)
+          data.color(y)(x) = PackedColor.pack(PackedColor.Color(line(x - col)), background, data.format)
       }
     }
   }
@@ -163,14 +178,13 @@ trait TextBufferProxy extends api.internal.TextBuffer {
     for (y <- row until ((row + color.length) min data.height)) {
       val line = color(y - row)
       for (x <- col until ((col + line.length) min data.width)) {
-        val packedBackground = data.format.deflate(PackedColor.Color(line(x - col))) & 0x00FF
-        val packedForeground = data.color(y)(x) & 0xFF00
-        data.color(y)(x) = (packedForeground | packedBackground).toShort
+          val foreground = PackedColor.foregroundColor(data.color(y)(x), data.format)
+          data.color(y)(x) = PackedColor.pack(foreground, PackedColor.Color(line(x - col)), data.format)
       }
     }
   }
 
-  private def color(column: Int, row: Int): Short = {
+  private def color(column: Int, row: Int): Long = {
     if (column < 0 || column >= getWidth || row < 0 || row >= getHeight)
       throw new IndexOutOfBoundsException()
     else data.color(row)(column)

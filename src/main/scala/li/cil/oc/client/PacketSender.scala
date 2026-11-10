@@ -18,6 +18,11 @@ import net.minecraft.util.SoundCategory
 import scala.tools.nsc.doc.model.Entity
 
 object PacketSender {
+  def sendPreviewPower(t: VMCasePreview): Unit = {
+    val pb = new SimplePacketBuilder(PacketType.OcppPreviewPower)
+    pb.writeTileEntity(t)
+    pb.sendToServer()
+  }
   // Timestamp after which the next clipboard message may be sent. Used to
   // avoid spamming large packets on key repeat.
   protected var clipboardCooldown = 0L

@@ -1,0 +1,145 @@
+# OC++ stage1 defaults: vanilla/OC ingredients; every new craft yields one.
+# Edit user.recipes to override. Never globally substitute old-tier materials.
+# GPU/APU recipes reject configured or renamed component inputs to preserve data.
+
+ocpp_chip4 {
+  input: [["minecraft:obsidian","minecraft:obsidian","minecraft:obsidian"],["redstone","oc:materialTransistor","redstone"],["minecraft:obsidian","minecraft:obsidian","minecraft:obsidian"]]
+  output: 1
+}
+
+ocpp_cpu4 {
+  input: [["minecraft:obsidian","redstone","minecraft:obsidian"],["oc:ocpp_chip4","oc:materialCU","oc:ocpp_chip4"],["minecraft:obsidian","oc:materialALU","minecraft:obsidian"]]
+  output: 1
+}
+
+ocpp_ram4 {
+  input: [["oc:ocpp_chip4","minecraft:obsidian","oc:ocpp_chip4"],["","oc:materialCircuitBoardPrinted",""]]
+  output: 1
+}
+
+ocpp_ram4_5 {
+  input: [["oc:ocpp_chip4","oc:ocpp_chip5","oc:ocpp_chip4"],["","oc:materialCircuitBoardPrinted",""]]
+  output: 1
+}
+
+ocpp_hdd4 {
+  input: [["oc:ocpp_chip4","oc:materialDisk","minecraft:obsidian"],["oc:materialCircuitBoardPrinted","oc:materialDisk","craftingPiston"],["oc:ocpp_chip4","oc:materialDisk","minecraft:obsidian"]]
+  output: 1
+}
+
+ocpp_gpu4 {
+  type: ocpp_pristine_shaped
+  input: [["oc:ocpp_chip4","oc:materialALU","oc:ocpp_ram4"],["","oc:materialCard",""]]
+  output: 1
+}
+
+ocpp_apu4 {
+  type: ocpp_pristine_shaped
+  input: [["minecraft:obsidian","oc:ocpp_chip4","minecraft:obsidian"],["oc:ocpp_cpu4","oc:componentBus3","oc:ocpp_gpu4"],["minecraft:obsidian","oc:ocpp_chip4","minecraft:obsidian"]]
+  output: 1
+}
+
+ocpp_case4 {
+  input: [["minecraft:obsidian","oc:ocpp_chip4","minecraft:obsidian"],["fenceIron","chest","fenceIron"],["minecraft:obsidian","oc:materialCircuitBoardPrinted","minecraft:obsidian"]]
+  output: 1
+}
+
+ocpp_screen4 {
+  input: [["minecraft:obsidian","minecraft:glowstone","minecraft:obsidian"],["minecraft:glowstone","oc:ocpp_chip4","blockGlass"],["minecraft:obsidian","minecraft:glowstone","minecraft:obsidian"]]
+  output: 1
+}
+
+ocpp_chip5 {
+  input: [["minecraft:dragon_breath","minecraft:dragon_breath","minecraft:dragon_breath"],["redstone","oc:materialTransistor","redstone"],["minecraft:dragon_breath","minecraft:dragon_breath","minecraft:dragon_breath"]]
+  output: 1
+}
+
+ocpp_cpu5 {
+  input: [["minecraft:dragon_breath","redstone","minecraft:dragon_breath"],["oc:ocpp_chip5","oc:materialCU","oc:ocpp_chip5"],["minecraft:dragon_breath","oc:materialALU","minecraft:dragon_breath"]]
+  output: 1
+}
+
+ocpp_ram5 {
+  input: [["oc:ocpp_chip5","minecraft:dragon_breath","oc:ocpp_chip5"],["","oc:materialCircuitBoardPrinted",""]]
+  output: 1
+}
+
+ocpp_ram5_5 {
+  input: [["oc:ocpp_chip5","oc:ocpp_chip6","oc:ocpp_chip5"],["","oc:materialCircuitBoardPrinted",""]]
+  output: 1
+}
+
+ocpp_hdd5 {
+  input: [["oc:ocpp_chip5","oc:materialDisk","minecraft:dragon_breath"],["oc:materialCircuitBoardPrinted","oc:materialDisk","craftingPiston"],["oc:ocpp_chip5","oc:materialDisk","minecraft:dragon_breath"]]
+  output: 1
+}
+
+ocpp_gpu5 {
+  type: ocpp_pristine_shaped
+  input: [["oc:ocpp_chip5","oc:materialALU","oc:ocpp_ram5"],["","oc:materialCard",""]]
+  output: 1
+}
+
+ocpp_apu5 {
+  type: ocpp_pristine_shaped
+  input: [["minecraft:dragon_breath","oc:ocpp_chip5","minecraft:dragon_breath"],["oc:ocpp_cpu5","oc:componentBus3","oc:ocpp_gpu5"],["minecraft:dragon_breath","oc:ocpp_chip5","minecraft:dragon_breath"]]
+  output: 1
+}
+
+ocpp_case5 {
+  input: [["minecraft:dragon_breath","oc:ocpp_chip5","minecraft:dragon_breath"],["fenceIron","chest","fenceIron"],["minecraft:dragon_breath","oc:materialCircuitBoardPrinted","minecraft:dragon_breath"]]
+  output: 1
+}
+
+ocpp_screen5 {
+  input: [["minecraft:dragon_breath","minecraft:golden_apple","minecraft:dragon_breath"],["minecraft:golden_apple","oc:ocpp_chip5","blockGlass"],["minecraft:dragon_breath","minecraft:golden_apple","minecraft:dragon_breath"]]
+  output: 1
+}
+
+ocpp_chip6 {
+  input: [["minecraft:nether_star","minecraft:nether_star","minecraft:nether_star"],["redstone","oc:materialTransistor","redstone"],["minecraft:nether_star","minecraft:nether_star","minecraft:nether_star"]]
+  output: 1
+}
+
+ocpp_cpu6 {
+  input: [["minecraft:nether_star","redstone","minecraft:nether_star"],["oc:ocpp_chip6","oc:materialCU","oc:ocpp_chip6"],["minecraft:nether_star","oc:materialALU","minecraft:nether_star"]]
+  output: 1
+}
+
+ocpp_ram6 {
+  input: [["oc:ocpp_chip6","minecraft:nether_star","oc:ocpp_chip6"],["","oc:materialCircuitBoardPrinted",""]]
+  output: 1
+}
+
+ocpp_ram6_5 {
+  input: [["oc:ocpp_chip6","oc:ocpp_chip6","oc:ocpp_chip6"],["oc:ocpp_chip5","oc:materialCircuitBoardPrinted","oc:ocpp_chip5"]]
+  output: 1
+}
+
+ocpp_hdd6 {
+  input: [["oc:ocpp_chip6","oc:materialDisk","minecraft:nether_star"],["oc:materialCircuitBoardPrinted","oc:materialDisk","craftingPiston"],["oc:ocpp_chip6","oc:materialDisk","minecraft:nether_star"]]
+  output: 1
+}
+
+ocpp_gpu6 {
+  type: ocpp_pristine_shaped
+  input: [["oc:ocpp_chip6","oc:materialALU","oc:ocpp_ram6"],["","oc:materialCard",""]]
+  output: 1
+}
+
+ocpp_apu6 {
+  type: ocpp_pristine_shaped
+  input: [["minecraft:nether_star","oc:ocpp_chip6","minecraft:nether_star"],["oc:ocpp_cpu6","oc:componentBus3","oc:ocpp_gpu6"],["minecraft:nether_star","oc:ocpp_chip6","minecraft:nether_star"]]
+  output: 1
+}
+
+ocpp_case6 {
+  input: [["minecraft:nether_star","oc:ocpp_chip6","minecraft:nether_star"],["fenceIron","chest","fenceIron"],["minecraft:nether_star","oc:materialCircuitBoardPrinted","minecraft:nether_star"]]
+  output: 1
+}
+
+ocpp_screen6 {
+  input: [["minecraft:nether_star","minecraft:sea_lantern","minecraft:nether_star"],["minecraft:sea_lantern","oc:ocpp_chip6","blockGlass"],["minecraft:nether_star","minecraft:sea_lantern","minecraft:nether_star"]]
+  output: 1
+}
+

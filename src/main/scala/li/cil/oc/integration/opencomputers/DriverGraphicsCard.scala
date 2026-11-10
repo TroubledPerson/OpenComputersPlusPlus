@@ -16,7 +16,8 @@ object DriverGraphicsCard extends Item with HostAware {
   override def worksWith(stack: ItemStack) = isOneOf(stack,
     api.Items.get(Constants.ItemName.GraphicsCardTier1),
     api.Items.get(Constants.ItemName.GraphicsCardTier2),
-    api.Items.get(Constants.ItemName.GraphicsCardTier3))
+    api.Items.get(Constants.ItemName.GraphicsCardTier3),
+    api.Items.get("ocpp_gpu4"), api.Items.get("ocpp_gpu5"), api.Items.get("ocpp_gpu6"))
 
   override def createEnvironment(stack: ItemStack, host: EnvironmentHost) =
     if (host.world != null && host.world.isRemote) null
@@ -24,6 +25,7 @@ object DriverGraphicsCard extends Item with HostAware {
       case Tier.One => new component.GraphicsCard(Tier.One)
       case Tier.Two => new component.GraphicsCard(Tier.Two)
       case Tier.Three => new component.GraphicsCard(Tier.Three)
+      case tier if tier >= 4 && tier <= 6 => new component.GraphicsCard(tier)
       case _ => null
     }
 

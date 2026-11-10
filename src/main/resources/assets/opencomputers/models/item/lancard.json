@@ -1,6 +1,6 @@
 {
     "parent": "opencomputers:item/flat",
     "textures": {
-        "layer0": "opencomputers:items/lancard"
+        "layer0": "opencomputers:items/ocpp_network1"
     }
 }

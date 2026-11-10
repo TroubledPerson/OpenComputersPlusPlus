@@ -113,7 +113,7 @@ class DiskDrive extends traits.Environment with traits.ComponentInventory with t
     }
     if (isServer) {
       ServerPacketSender.sendFloppyChange(this, stack)
-      Sound.playDiskInsert(this)
+      playInsertSound()
     }
   }
 
@@ -121,12 +121,15 @@ class DiskDrive extends traits.Environment with traits.ComponentInventory with t
     super.onItemRemoved(slot, stack)
     if (isServer) {
       ServerPacketSender.sendFloppyChange(this)
-      Sound.playDiskEject(this)
+      playEjectSound()
     }
   }
 
   // ----------------------------------------------------------------------- //
   // TileEntity
+
+  protected def playInsertSound(): Unit = Sound.playDiskInsert(this)
+  protected def playEjectSound(): Unit = Sound.playDiskEject(this)
 
   private final val DiskTag = Settings.namespace + "disk"
 

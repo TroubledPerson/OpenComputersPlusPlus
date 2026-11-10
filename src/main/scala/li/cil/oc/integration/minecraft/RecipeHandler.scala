@@ -3,6 +3,7 @@ package li.cil.oc.integration.minecraft
 import com.typesafe.config.Config
 import li.cil.oc.common.recipe.ExtendedShapedOreRecipe
 import li.cil.oc.common.recipe.ExtendedShapelessOreRecipe
+import li.cil.oc.common.recipe.PristineShapedOreRecipe
 import li.cil.oc.common.recipe.Recipes
 import li.cil.oc.common.recipe.Recipes.RecipeException
 import net.minecraft.item.ItemStack
@@ -16,11 +17,15 @@ import scala.collection.mutable
 object RecipeHandler {
   def init(): Unit = {
     Recipes.registerRecipeHandler("shaped", addShapedRecipe)
+    Recipes.registerRecipeHandler("ocpp_pristine_shaped", (output, config) => addShapedRecipe(output, config, true))
+    Recipes.registerRecipeHandler("ocpp_openos_cd", (output, config) => Recipes.addRecipe(new li.cil.oc.common.recipe.OpenOSCDRecipe(output)))
     Recipes.registerRecipeHandler("shapeless", addShapelessRecipe)
     Recipes.registerRecipeHandler("furnace", addFurnaceRecipe)
   }
 
-  def addShapedRecipe(output: ItemStack, recipe: Config) {
+  def addShapedRecipe(output: ItemStack, recipe: Config): Unit = addShapedRecipe(output, recipe, false)
+
+  private def addShapedRecipe(output: ItemStack, recipe: Config, pristine: Boolean) {
     val rows = recipe.getList("input").unwrapped().map {
       case row: java.util.List[AnyRef]@unchecked => row.map(Recipes.parseIngredient)
       case other => throw new RecipeException(s"Invalid row entry for shaped recipe (not a list: $other).")
@@ -44,7 +49,8 @@ object RecipeHandler {
       input ++= ingredients
     }
     if (input.nonEmpty && output.getCount > 0) {
-      Recipes.addRecipe(new ExtendedShapedOreRecipe(output, shape ++ input: _*))
+      if (pristine) Recipes.addRecipe(new PristineShapedOreRecipe(output, shape ++ input: _*))
+      else Recipes.addRecipe(new ExtendedShapedOreRecipe(output, shape ++ input: _*))
     }
   }
 

@@ -12,12 +12,16 @@ object PackedColor {
       case api.internal.TextBuffer.ColorDepth.OneBit => 1
       case api.internal.TextBuffer.ColorDepth.FourBit => 4
       case api.internal.TextBuffer.ColorDepth.EightBit => 8
+      case api.internal.TextBuffer.ColorDepth.SixteenBit => 16
+      case api.internal.TextBuffer.ColorDepth.TwentyFourBit => 24
+      case api.internal.TextBuffer.ColorDepth.ThirtyTwoBit => 32
     }
 
     def format(depth: api.internal.TextBuffer.ColorDepth) = depth match {
       case api.internal.TextBuffer.ColorDepth.OneBit => SingleBitFormat
       case api.internal.TextBuffer.ColorDepth.FourBit => new MutablePaletteFormat
       case api.internal.TextBuffer.ColorDepth.EightBit => new HybridFormat
+      case depth => new DirectFormat(depth)
     }
   }
 
@@ -43,7 +47,9 @@ object PackedColor {
       }
     }
 
-    def deflate(value: Color): Byte
+    def deflate(value: Color): Int
+
+    def alpha(value: Int): Int = 255
 
     def isFromPalette(value: Int): Boolean = false
 
@@ -57,12 +63,12 @@ object PackedColor {
 
     override def inflate(value: Int) = if (value == 0) 0x000000 else color
 
-    override def deflate(value: Color) = {
-      (if (value.value == 0) 0 else 1).toByte
+    override def deflate(value: Color): Int = {
+      if (value.value == 0) 0 else 1
     }
   }
 
-  object SingleBitFormat extends SingleBitFormat(Settings.get.monochromeColor)
+  object SingleBitFormat extends SingleBitFormat(if (Settings.get == null) 0xFFFFFF else Settings.get.monochromeColor)
 
   abstract class PaletteFormat extends ColorFormat {
     override def inflate(value: Int) = palette(math.max(0, math.min(palette.length - 1, value)))
@@ -73,9 +79,9 @@ object PackedColor {
       }
     }
 
-    override def deflate(value: Color) =
-      if (value.isPalette) (math.max(0, value.value) % palette.length).toByte
-      else palette.map(delta(value.value, _)).zipWithIndex.minBy(_._1)._2.toByte
+    override def deflate(value: Color): Int =
+      if (value.isPalette) math.max(0, value.value) % palette.length
+      else palette.map(delta(value.value, _)).zipWithIndex.minBy(_._1)._2
 
     override def isFromPalette(value: Int) = true
 
@@ -146,7 +152,7 @@ object PackedColor {
       if (isFromPalette(value)) super.inflate(value)
       else staticPalette((value - palette.length) % 240)
 
-    override def deflate(value: Color) = {
+    override def deflate(value: Color): Int = {
       val paletteIndex = super.deflate(value)
       if (value.isPalette) paletteIndex
       else {
@@ -154,7 +160,7 @@ object PackedColor {
         val idxR = (r * (reds - 1.0) / 0xFF + 0.5).toInt
         val idxG = (g * (greens - 1.0) / 0xFF + 0.5).toInt
         val idxB = (b * (blues - 1.0) / 0xFF + 0.5).toInt
-        val deflated = (palette.length + idxR * greens * blues + idxG * blues + idxB).toByte
+        val deflated = palette.length + idxR * greens * blues + idxG * blues + idxB
         if (delta(inflate(deflated & 0xFF), value.value) < delta(inflate(paletteIndex & 0xFF), value.value)) {
           deflated
         }
@@ -167,23 +173,54 @@ object PackedColor {
     override def isFromPalette(value: Int) = value >= 0 && value < palette.length
   }
 
-  case class Color(value: Int, isPalette: Boolean = false)
-
-  // Colors are packed: 0xFFBB (F = foreground, B = background)
-  val ForegroundShift = 8
-  val BackgroundMask = 0x000000FF
-
-  def pack(foreground: Color, background: Color, format: ColorFormat) = {
-    (((format.deflate(foreground) & 0xFF) << ForegroundShift) | (format.deflate(background) & 0xFF)).toShort
+  class DirectFormat(override val depth: api.internal.TextBuffer.ColorDepth) extends ColorFormat {
+    private val bits = Depth.bits(depth)
+    require(bits == 16 || bits == 24 || bits == 32)
+    override def inflate(value: Int): Int =
+      if (bits == 16) li.cil.oc.plusplus.ColorCodec.from565(value) else value & 0xFFFFFF
+    override def alpha(value: Int): Int = if (bits == 32) value >>> 24 else 255
+    override def deflate(value: Color): Int = {
+      validate(value)
+      if (bits == 16) li.cil.oc.plusplus.ColorCodec.to565(value.value)
+      else if (bits == 24) value.value & 0xFFFFFF
+      else (value.alpha << 24) | (value.value & 0xFFFFFF)
+    }
   }
 
-  def extractForeground(color: Short) = (color & 0xFFFF) >>> ForegroundShift
+  case class Color(value: Int, isPalette: Boolean = false, alpha: Int = 255) {
+    require(alpha >= 0 && alpha <= 255, "alpha must be 0..255")
+  }
 
-  def extractBackground(color: Short) = color & BackgroundMask
+  // Two unsigned 32-bit components; legacy saves still use their original shorts.
+  val ForegroundShift = 32
+  val BackgroundMask = 0xFFFFFFFFL
 
-  def unpackForeground(color: Short, format: ColorFormat) =
+  def pack(foreground: Color, background: Color, format: ColorFormat) = {
+    ((format.deflate(foreground).toLong & 0xFFFFFFFFL) << ForegroundShift) | (format.deflate(background).toLong & BackgroundMask)
+  }
+
+  def extractForeground(color: Long): Int = (color >>> ForegroundShift).toInt
+
+  def extractBackground(color: Long): Int = color.toInt
+
+  def unpackForeground(color: Long, format: ColorFormat) =
     format.inflate(extractForeground(color))
 
-  def unpackBackground(color: Short, format: ColorFormat) =
+  def unpackBackground(color: Long, format: ColorFormat) =
     format.inflate(extractBackground(color))
+
+  def foregroundColor(color: Long, format: ColorFormat): Color =
+    Color(unpackForeground(color, format), false, format.alpha(extractForeground(color)))
+
+  def backgroundColor(color: Long, format: ColorFormat): Color =
+    Color(unpackBackground(color, format), false, format.alpha(extractBackground(color)))
+
+  def renderBackground(color: Long, format: ColorFormat): Int =
+    li.cil.oc.plusplus.ColorCodec.over(unpackBackground(color, format), format.alpha(extractBackground(color)), 0)
+
+  def renderForeground(color: Long, format: ColorFormat): Int = {
+    val alpha = format.alpha(extractForeground(color))
+    val foreground = unpackForeground(color, format)
+    if (alpha == 255) foreground else li.cil.oc.plusplus.ColorCodec.over(foreground, alpha, renderBackground(color, format))
+  }
 }

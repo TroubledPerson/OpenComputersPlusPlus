@@ -24,7 +24,13 @@ object DriverMemory extends Item with api.driver.item.Memory with api.driver.ite
     api.Items.get(Constants.ItemName.RAMTier3),
     api.Items.get(Constants.ItemName.RAMTier4),
     api.Items.get(Constants.ItemName.RAMTier5),
-    api.Items.get(Constants.ItemName.RAMTier6))
+    api.Items.get(Constants.ItemName.RAMTier6),
+    api.Items.get("ocpp_ram4"),
+    api.Items.get("ocpp_ram5"),
+    api.Items.get("ocpp_ram6"),
+    api.Items.get("ocpp_ram4_5"),
+    api.Items.get("ocpp_ram5_5"),
+    api.Items.get("ocpp_ram6_5"))
 
   override def createEnvironment(stack: ItemStack, host: api.network.EnvironmentHost) = new component.Memory(tier(stack))
 
@@ -32,9 +38,9 @@ object DriverMemory extends Item with api.driver.item.Memory with api.driver.ite
 
   override def tier(stack: ItemStack) =
     Delegator.subItem(stack) match {
-      case Some(memory: item.Memory) => memory.tier / 2
+      case Some(memory: item.Memory) => li.cil.oc.plusplus.TierProfiles.memoryTier(memory.tier)
       case _ => Tier.One
     }
 
-  override def getCallBudget(stack: ItemStack): Double = Settings.get.callBudgets(tier(stack) max Tier.One min Tier.Three)
+  override def getCallBudget(stack: ItemStack): Double = Settings.get.callBudgets(tier(stack) max Tier.One min (Settings.get.callBudgets.length - 1))
 }

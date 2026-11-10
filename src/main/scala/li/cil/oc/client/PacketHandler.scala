@@ -108,6 +108,9 @@ object PacketHandler extends CommonPacketHandler {
       case PacketType.SoundEffect => onSoundEffect(p)
       case PacketType.Sound => onSound(p)
       case PacketType.SoundPattern => onSoundPattern(p)
+      case PacketType.OcppAudio => onCardAudio(p)
+        case PacketType.OcppOpticalSound => onOpticalSound(p)
+        case PacketType.OcppOpticalMotor => onOpticalMotor(p)
       case PacketType.TransposerActivity => onTransposerActivity(p)
       case PacketType.WaypointLabel => onWaypointLabel(p)
       case _ => // Invalid packet.
@@ -641,6 +644,7 @@ object PacketHandler extends CommonPacketHandler {
         try while (true) {
           p.readPacketType() match {
             case PacketType.TextBufferMultiColorChange => onTextBufferMultiColorChange(p, buffer)
+            case PacketType.TextBufferMultiColorAlphaChange => onTextBufferMultiColorAlphaChange(p, buffer)
             case PacketType.TextBufferMultiCopy => onTextBufferMultiCopy(p, buffer)
             case PacketType.TextBufferMultiDepthChange => onTextBufferMultiDepthChange(p, buffer)
             case PacketType.TextBufferMultiFill => onTextBufferMultiFill(p, buffer)
@@ -663,6 +667,12 @@ object PacketHandler extends CommonPacketHandler {
         }
       case _ => // Invalid packet.
     }
+
+  def onTextBufferMultiColorAlphaChange(p: PacketParser, env: api.internal.TextBuffer): Unit = {
+    val (foreground, background) = li.cil.oc.common.ColorBrushPacket.read(p, alpha = true)
+    env.setForegroundColorRGBA(foreground.value, foreground.alpha)
+    env.setBackgroundColorRGBA(background.value, background.alpha)
+  }
 
   def onTextBufferMultiColorChange(p: PacketParser, env: api.internal.TextBuffer) {
     env match {
@@ -845,6 +855,29 @@ object PacketHandler extends CommonPacketHandler {
       val duration = p.readShort()
       Audio.play(x + 0.5f, y + 0.5f, z + 0.5f, frequency, duration)
     }
+  }
+
+  def onOpticalSound(p: PacketParser): Unit = {
+    val dimension=p.readInt();val x=p.readInt();val y=p.readInt();val z=p.readInt();val action=p.readUnsignedByte()
+    li.cil.oc.plusplus.OpticalAudioDiagnostics.record(li.cil.oc.plusplus.OpticalAudioDiagnostics.PacketDecoded)
+    if(world(p.player,dimension).isDefined && math.abs(x.toLong)<=30000000L && math.abs(z.toLong)<=30000000L && y>=0 && y<256 && action<=3)
+      OpticalAudio.receive(new net.minecraft.util.math.BlockPos(x,y,z),action)
+    else li.cil.oc.plusplus.OpticalAudioDiagnostics.record(li.cil.oc.plusplus.OpticalAudioDiagnostics.PacketRejected)
+  }
+
+  def onOpticalMotor(p:PacketParser):Unit={
+    val dimension=p.readInt();val x=p.readInt();val y=p.readInt();val z=p.readInt()
+    val epoch=p.readLong();val generation=p.readLong();val sequence=p.readLong();val action=p.readUnsignedByte();val age=p.readInt()
+    if(action==li.cil.oc.plusplus.OpticalDrivePlayback.SEEK)li.cil.oc.plusplus.OpticalAudioDiagnostics.record(li.cil.oc.plusplus.OpticalAudioDiagnostics.PacketDecoded)
+    if(world(p.player,dimension).isDefined&&math.abs(x.toLong)<=30000000L&&math.abs(z.toLong)<=30000000L&&y>=0&&y<256&&epoch>0&&generation>=0&&sequence>=0&&action<=li.cil.oc.plusplus.OpticalDrivePlayback.EJECT&&age>=0&&age<=li.cil.oc.plusplus.OpticalDrivePlayback.STARTUP_TICKS)
+      OpticalAudio.receiveMotor(new net.minecraft.util.math.BlockPos(x,y,z),epoch,generation,sequence,action,age)
+    else li.cil.oc.plusplus.OpticalAudioDiagnostics.record(li.cil.oc.plusplus.OpticalAudioDiagnostics.PacketRejected)
+  }
+
+  def onCardAudio(p: PacketParser): Unit = {
+    val dimension=p.readInt();val x=p.readDouble();val y=p.readDouble();val z=p.readDouble();val key=p.readUTF();val token=p.readLong();val action=p.readUnsignedByte()
+    if(world(p.player,dimension).isEmpty || key.length>64 || x.isNaN || y.isNaN || z.isNaN || x.isInfinity || y.isInfinity || z.isInfinity || math.abs(x)>32000000 || math.abs(y)>32000000 || math.abs(z)>32000000)return
+    CardAudio.receive(p,key,token,action,x.toFloat,y.toFloat,z.toFloat)
   }
 
   def onSoundPattern(p: PacketParser) {

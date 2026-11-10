@@ -1,0 +1,12 @@
+{
+  "url": "https://repo.maven.apache.org/maven2/commons-io/commons-io/2.21.0/commons-io-2.21.0.jar",
+  "bytes": 585274,
+  "repositorySha1PreviouslyChecked": "52a6f68fe5afe335cde95461dd5c3412f04996f7",
+  "sha256": "7d643a2afea8b058b762aa6fb90e5b256f6c729739f8b3784c3370ddc609e88d",
+  "signatureReview": "Bouncy Castle original JAR signature verified cryptographically; certificate chain was not trusted by JDK8 jarsigner. No trust-store changes.",
+  "failedMetadataFilesPreserved": [
+    "smbj-0.14.0.pom",
+    "commons-net-3.13.0.pom"
+  ],
+  "failedMetadataReason": "restricted DNS failed; valid reviewed metadata was later acquired with approval under distinct review filenames"
+}

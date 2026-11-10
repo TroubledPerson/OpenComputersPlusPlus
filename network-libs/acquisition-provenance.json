@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://repo.maven.apache.org/maven2/com/hierynomus/smbj/0.14.0/smbj-0.14.0.jar",
+    "bytes": 607813,
+    "repositorySha1": "59cb9bc643fa44144700cc3ba479c3f3555f515c",
+    "sha256": "f5cd63af2f343bfa13d41dbf50cfd251d2b99c4118fbe82b0e94ee0f93d1cc14"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/commons-net/commons-net/3.13.0/commons-net-3.13.0.jar",
+    "bytes": 337311,
+    "repositorySha1": "c16e8410310bbaa4ecaf2526ab7ed4f671d86bfa",
+    "sha256": "9e88444afadc9467f0bf3d328f93b9538da35a9be05cdee430766e64fddbd6c5"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/1.86/bcprov-jdk18on-1.86.jar",
+    "bytes": 7224011,
+    "repositorySha1": "830c8467bed8e4c1148262386b09fc42aedcf262",
+    "sha256": "2af190b300cbb0b35e248ccf5f4a06b6072030aeb3da7a98ec73abe5b4cb371f"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar",
+    "bytes": 64579,
+    "repositorySha1": "7cf2726fdcfbc8610f9a71fb3ed639871f315340",
+    "sha256": "0818930dc8d7debb403204611691da58e49d42c50b6ffcfdce02dadb7c3c2b6c"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/net/engio/mbassador/1.3.0/mbassador-1.3.0.jar",
+    "bytes": 97128,
+    "repositorySha1": "df00b81f8efe0bfd7d0fdd63da988e2223d16a03",
+    "sha256": "f065031a490c88c9b20d34f3c9c4eb6e0dffe329c090788c383574e1ac7c6bba"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/com/hierynomus/asn-one/0.6.0/asn-one-0.6.0.jar",
+    "bytes": 67005,
+    "repositorySha1": "7f6141541e0a4d3ae0b02c901c2c1e9a772eb3d7",
+    "sha256": "e4f70fd92849b52240048b8ebace0c9a17d3bb7b9c882b3c7778cec3458495f5"
+  }
+]

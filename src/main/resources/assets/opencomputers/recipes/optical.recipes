@@ -1,0 +1,20 @@
+# Virtual optical media: all output one, raw materials only, no used-disc conversion.
+ocpp_cdr {
+  type: shapeless
+  input: ["oc:materialDisk", "minecraft:glass", "minecraft:paper"]
+  output: 1
+}
+ocpp_cdrw {
+  type: shapeless
+  input: ["oc:materialDisk", "minecraft:glass", "minecraft:paper", "oc:circuitChip1"]
+  output: 1
+}
+ocpp_cddrive {
+  input: [["ingotIron", "oc:circuitChip1", "ingotIron"], ["craftingPiston", "minecraft:glass", "oc:materialDisk"], ["ingotIron", "oc:materialCircuitBoardPrinted", "ingotIron"]]
+  output: 1
+}
+ocpp_openos_cdr {
+  type: "ocpp_openos_cd"
+  output: 1
+  input: ["oc:ocpp_cdr", "oc:openos"]
+}

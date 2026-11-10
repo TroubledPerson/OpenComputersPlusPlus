@@ -70,7 +70,9 @@ trait VideoRamRasterizer {
   def loadBuffer(owner: String, id: Int, nbt: NBTTagCompound): Boolean = {
     val src = new li.cil.oc.util.TextBuffer(width = 1, height = 1, li.cil.oc.util.PackedColor.SingleBitFormat)
     src.load(nbt)
-    addBuffer(component.GpuTextBuffer.wrap(owner, id, src))
+      val page = component.GpuTextBuffer.wrap(owner, id, src)
+      if (nbt.hasKey("ocppMaximumDepth")) page.setMaximumColorDepth(li.cil.oc.api.internal.TextBuffer.ColorDepth.values.apply(nbt.getInteger("ocppMaximumDepth") max src.format.depth.ordinal min 5))
+      addBuffer(page)
   }
 
   def getBuffer(owner: String, id: Int): Option[component.GpuTextBuffer] = {

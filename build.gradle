@@ -19,6 +19,9 @@ fancyGradle {
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.withType(Javadoc).configureEach { options.encoding = 'UTF-8' }
+
 file "build.properties" withReader {
     def prop = new Properties()
     prop.load(it)
@@ -34,15 +37,17 @@ group = config.mod.group
 archivesBaseName = config.mod.name
 
 def getGitRef() {
+    if (!file('.git').exists()) return "258943363-ocpp"
     try {
         def stdout = new ByteArrayOutputStream()
         exec {
             commandLine 'git', 'rev-parse', '--short', 'HEAD'
             standardOutput = stdout
         }
-        return stdout.toString().trim()
+        def ref = stdout.toString().trim()
+        return ref ? ref : "258943363-ocpp"
     } catch (Throwable e) {
-        return "unknown"
+        return "258943363-ocpp"
     }
 }
 
@@ -86,6 +91,10 @@ minecraft {
 }
 
 task replaceSourceTokensScala(type: Sync) {
+    // Captured filter values must participate in incremental invalidation.
+    inputs.property('ocppVersionToken', mod_version.toString())
+    inputs.property('ocppMinecraftVersionToken', config.minecraft.version.toString())
+    filteringCharset = 'UTF-8'
     from sourceSets.main.scala
     filter { line -> line
             .replaceAll('@VERSION@', "${mod_version}")
@@ -150,6 +159,10 @@ configurations {
 }
 
 dependencies {
+    // Compile-only copies; runtime clients load original checksum-pinned JARs in
+    // a private loader. Never merge signed providers or replace Minecraft IO.
+    compileOnly files(fileTree('network-libs') { include '*.jar'; exclude '*-sources.jar' })
+    testImplementation files(fileTree('network-libs') { include '*.jar'; exclude '*-sources.jar' })
     minecraft "net.minecraftforge:forge:${config.minecraft.version}-${config.forge.version}"
 
     compileOnly fg.deobf("li.cil.tis3d:TIS-3D:${config.tis3d.version}") {
@@ -222,7 +235,125 @@ dependencies {
     provided fg.deobf("codechicken:EnderStorage:${config.minecraft.version}-${config.enderstorage.version}:universal")
 }
 
+test {
+    // Headless fixtures load untransformed OC optional interfaces. Reuse existing
+    // declared APIs only here; Forge handles optional stripping in a real launch.
+    classpath += configurations.provided
+    systemProperty 'ocpp.sourceRoot', projectDir.absolutePath
+    systemProperty 'ocpp.libraryDirectory', file('network-libs').absolutePath
+    systemProperty 'ocpp.spriteSourceItems', file('src/main/resources/assets/opencomputers/textures/items').absolutePath
+    systemProperty 'ocpp.spriteGenerated', file("$buildDir/generated/tier-style-v2").absolutePath
+    exclude '**/PackagedClientTest*'
+    exclude '**/PackagedAudioTest*'
+    // Actual-JAR API2/legacy-addon isolation runs in the packaged suite below.
+    exclude '**/PackagedApi2Test*'
+}
+
+tasks.register('oneJarTest', Test) {
+    dependsOn testClasses
+    dependsOn 'companionJar'
+    mustRunAfter 'reobfJar'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    include '**/PackagedClientTest*'
+    include '**/PackagedAudioTest*'
+    include '**/PackagedApi2Test*'
+    systemProperty 'ocpp.api2SourceRoot', projectDir.absolutePath
+    maxHeapSize = '192m'
+    systemProperty 'ocpp.packagedJar', project.findProperty('ocppPackagedJar') ?: tasks.jar.archiveFile.get().asFile.absolutePath
+    systemProperty 'ocpp.originalLibraries', file('network-libs').absolutePath
+    systemProperty 'ocpp.fixtureRoot', file("$buildDir/onejar-fixtures").absolutePath
+    def legacyIo = fileTree(new File(gradle.gradleUserHomeDir, 'caches/modules-2/files-2.1/commons-io/commons-io/2.5')) { include '**/*.jar' }
+    doFirst { systemProperty 'ocpp.legacyCommonsIo', legacyIo.singleFile.absolutePath }
+}
+// Optional developer-only classpath for a bounded Java-only loader rebuild.
+// Default builds compile every source normally; this does not change runtime APIs.
+if (project.hasProperty('ocppStagedLoader')) {
+    tasks.withType(Test).configureEach { classpath = files(file(project.property('ocppStagedLoader'))) + classpath }
+}
+check.dependsOn tasks.named('oneJarTest')
+
+// Reviewed pure-Java codecs. Complete upstream source/licenses are shipped in
+// the matching source snapshot; nothing downloads or executes a player here.
+def ocppJlayerJar = file(findProperty('ocppJlayerJar') ?: 'audio-libs/jlayer-1.0.1.jar')
+def ocppFlacSource = file(findProperty('ocppFlacSource') ?: 'audio-libs/nayuki-java8-source')
+tasks.register('compileFlacCodec', JavaCompile) {
+    source fileTree(new File(ocppFlacSource,'src')) { include 'io/nayuki/flac/common/*.java', 'io/nayuki/flac/decode/*.java', 'io/nayuki/flac/encode/*.java' }
+    destinationDirectory = file("$buildDir/audio-codecs/classes")
+    classpath = files()
+    sourceCompatibility = '1.8'; targetCompatibility = '1.8'
+    options.encoding = 'UTF-8'
+}
+tasks.register('flacCodecJar', Jar) {
+    dependsOn 'compileFlacCodec'
+    archiveFileName = 'nayuki-flac-c9b8727b.jar'
+    destinationDirectory = file("$buildDir/audio-codecs")
+    preserveFileTimestamps = false; reproducibleFileOrder = true
+    from tasks.named('compileFlacCodec').map { it.destinationDirectory }
+    from(ocppFlacSource) { include 'COPYING*.txt'; into 'META-INF/licenses' }
+}
+dependencies {
+    compileOnly files(ocppJlayerJar, tasks.named('flacCodecJar'))
+    testImplementation files(ocppJlayerJar, tasks.named('flacCodecJar'))
+}
+compileJava.dependsOn 'flacCodecJar'
+tasks.register('generateAudioRuntime') {
+    dependsOn 'flacCodecJar'
+    inputs.files(ocppJlayerJar, tasks.named('flacCodecJar'))
+    inputs.files('audio-libs/LICENSE-JLayer-LGPL2.1.txt','audio-libs/nayuki-java8-source/COPYING.txt','audio-libs/nayuki-java8-source/COPYING.LESSER.txt')
+    outputs.dir("$buildDir/generated/audio-runtime")
+    doLast {
+        def out = file("$buildDir/generated/audio-runtime/META-INF/ocpp-audio")
+        out.mkdirs()
+        def entries = ['jlayer-1.0.1.jar':ocppJlayerJar,'nayuki-flac-c9b8727b.jar':tasks.named('flacCodecJar').get().archiveFile.get().asFile]
+        def props = new StringBuilder()
+        entries.each { name,f ->
+            copy { from f; into out; rename { name } }
+            props.append(name).append('=').append(java.security.MessageDigest.getInstance('SHA-256').digest(f.bytes).encodeHex().toString()).append('\n')
+        }
+        new File(out,'runtime.properties').setText(props.toString(),'UTF-8')
+        copy { from 'audio-libs/LICENSE-JLayer-LGPL2.1.txt','audio-libs/nayuki-java8-source/COPYING.txt','audio-libs/nayuki-java8-source/COPYING.LESSER.txt'; into out }
+    }
+}
 processResources {
+    dependsOn 'generateAudioRuntime'
+    from("$buildDir/generated/audio-runtime")
+}
+test {
+    systemProperty 'ocpp.audioJlayer', ocppJlayerJar.absolutePath
+    systemProperty 'ocpp.audioFlac', file("$buildDir/audio-codecs/nayuki-flac-c9b8727b.jar").absolutePath
+}
+
+tasks.register('generateTierSpriteLayers', JavaExec) {
+    dependsOn compileJava
+    classpath = files("$buildDir/classes/java/main")
+    mainClass = 'li.cil.oc.plusplus.TierSpriteLayers'
+    def originals = file('src/main/resources/assets/opencomputers/textures/items')
+    inputs.files(fileTree(originals) { include 'cpu*.png', 'hdd*.png', 'graphicscard*.png', 'ram*.png', 'apu*.png', 'apu*.mcmeta', 'chip*.png' })
+    inputs.file('src/main/java/li/cil/oc/plusplus/TierSpriteLayers.java')
+    inputs.file('src/main/java/li/cil/oc/plusplus/StageOneSprites.java')
+    inputs.file('src/main/java/li/cil/oc/plusplus/OpticalSprites.java')
+    inputs.file('src/main/java/li/cil/oc/plusplus/SoundSprites.java')
+    inputs.file('src/main/java/li/cil/oc/plusplus/NetworkSprites.java')
+    inputs.file('src/main/java/li/cil/oc/plusplus/PreviewSprites.java')
+    inputs.files(fileTree('src/main/resources/assets/opencomputers/textures/blocks') { include 'case_*.png', 'screen/*.png' })
+    inputs.file('src/main/resources/assets/opencomputers/textures/items/internetcard.png')
+    inputs.file('src/main/resources/assets/opencomputers/textures/items/lancard.png')
+    inputs.file('src/main/resources/assets/opencomputers/textures/items/disk.png')
+    inputs.file('src/main/resources/assets/opencomputers/textures/blocks/diskdrive_front.png')
+    inputs.file('src/main/resources/assets/opencomputers/textures/gui/background.png')
+    outputs.dir("$buildDir/generated/tier-style-v2")
+    outputs.dir("$buildDir/tier-sprite-preview")
+    args originals.absolutePath, file("$buildDir/generated/tier-style-v2").absolutePath, file("$buildDir/tier-sprite-preview").absolutePath
+    jvmArgs '-Djava.awt.headless=true', "-Duser.home=${projectDir.parentFile}/build-home", "-Djava.io.tmpdir=${projectDir.parentFile}/build-temp"
+}
+
+processResources {
+    dependsOn 'generateOpenOSMaster'
+    from("$buildDir/generated/openos-master")
+    dependsOn tasks.named('generateTierSpriteLayers')
+    from("$buildDir/generated/tier-style-v2")
+    filteringCharset = 'UTF-8'
     inputs.property "version", "${mod_version}"
     inputs.property "mcversion", config.minecraft.version
     inputs.property "fversion", config.forge.version
@@ -240,7 +371,53 @@ processResources {
     rename '(.+_at.cfg)', 'META-INF/$1'
 }
 
+// Metadata only. No emulator, firmware, guest or host service is bundled/run.
+tasks.register('generateOpenOSMaster', JavaExec) {
+    dependsOn compileJava
+    classpath = files("$buildDir/classes/java/main") + sourceSets.main.compileClasspath
+    mainClass = 'li.cil.oc.plusplus.OpenOSMaster'
+    inputs.dir('src/main/resources/assets/opencomputers/loot/openos')
+    inputs.file('src/main/java/li/cil/oc/plusplus/OpenOSMaster.java')
+    outputs.dir("$buildDir/generated/openos-master")
+    args file('src/main/resources/assets/opencomputers/loot/openos').absolutePath,
+        file("$buildDir/generated/openos-master/assets/opencomputers/openos-master.manifest").absolutePath
+    jvmArgs '-Djava.awt.headless=true', "-Djava.io.tmpdir=${projectDir.parentFile}/build-temp"
+}
+
+sourceSets {
+    companion {
+        java.setSrcDirs(['src/companion/java'])
+        resources.setSrcDirs(['src/companion/resources'])
+        compileClasspath = sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + compileClasspath
+    }
+}
+tasks.named('compileCompanionJava') { dependsOn classes }
+sourceSets.test.compileClasspath += sourceSets.companion.output
+tasks.named('compileTestJava') { dependsOn companionClasses }
+tasks.register('companionJar', Jar) {
+    dependsOn companionClasses
+    archiveFileName = 'OCVMIntegration-offline-dev.2.jar'
+    destinationDirectory = file("$buildDir/libs")
+    from sourceSets.companion.output
+    from('LICENSE') { into 'META-INF' }
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+test {
+    dependsOn companionClasses
+    classpath += sourceSets.companion.output
+}
+
 jar {
+    // Store original signed archives as data. Never flatten, relocate or strip
+    // their manifests, service resources or signatures, or add them globally.
+    from('network-libs') {
+        include 'smbj-0.14.0.jar', 'commons-net-3.13.0.jar', 'bcprov-jdk18on-1.86.jar',
+            'slf4j-api-2.0.9.jar', 'mbassador-1.3.0.jar', 'asn-one-0.6.0.jar',
+            'commons-io-2.21.0.jar', 'THIRD-PARTY-NOTICES.txt'
+        into 'META-INF/ocpp-runtime'
+    }
     configurations.embedded.each { dep ->
         from(project.zipTree(dep)) {
             exclude 'META-INF', 'META-INF/**'
@@ -321,3 +498,63 @@ modrinth {
     gameVersions = [config.minecraft.version]
     loaders = ["forge"]
 }
+
+// Optional simulated QMP addon. Parallel source set preserves offline dev2 and main dev33.
+sourceSets {
+    companionSimulated {
+        java.setSrcDirs(['src/companionSimulated/java'])
+        resources.setSrcDirs(['src/companionSimulated/resources'])
+        compileClasspath = sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath = output + compileClasspath
+    }
+}
+tasks.named('compileCompanionSimulatedJava') { dependsOn classes }
+sourceSets.test.compileClasspath += sourceSets.companionSimulated.output
+sourceSets.test.runtimeClasspath += sourceSets.companionSimulated.output
+tasks.named('compileTestJava') { dependsOn companionSimulatedClasses }
+tasks.register('companionSimulatedJar', Jar) {
+    dependsOn companionSimulatedClasses
+    archiveFileName = 'OCVMIntegration-simulated-dev.3.jar'
+    destinationDirectory = file("$buildDir/libs")
+    from sourceSets.companionSimulated.output
+    from('LICENSE') { into 'META-INF' }
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+test {
+    dependsOn 'companionSimulatedJar'
+    exclude '**/PackagedSimulatedAddonTest*'
+}
+tasks.named('oneJarTest') {
+    dependsOn 'companionSimulatedJar'
+    include '**/PackagedSimulatedAddonTest*'
+    systemProperty 'ocpp.simulatedAddon', tasks.named('companionSimulatedJar').get().archiveFile.get().asFile.absolutePath
+}
+
+// Test tasks capture their classpath before the later parallel source set exists.
+// Add it explicitly to both actual task classpaths, not only SourceSet metadata.
+tasks.named('test') { classpath += sourceSets.companionSimulated.output }
+tasks.named('oneJarTest') { classpath += sourceSets.companionSimulated.output }
+
+// Configuration export only: no test/build/native task dependencies or actions.
+tasks.register('exportSimulatedTestModel') {
+    doLast {
+        def model = [:]
+        ['test','oneJarTest'].each { name ->
+            def selected = tasks.named(name).get()
+            def properties = [:]
+            selected.systemProperties.each { key, value ->
+                if (key.toString().startsWith('ocpp.') || key.toString() == 'java.awt.headless') properties[key.toString()] = value.toString()
+            }
+            if (name == 'oneJarTest') {
+                def legacy = fileTree(new File(gradle.gradleUserHomeDir,'caches/modules-2/files-2.1/commons-io/commons-io/2.5')) { include '**/*.jar' }
+                properties['ocpp.legacyCommonsIo'] = legacy.singleFile.absolutePath
+            }
+            model[name] = [classpath: selected.classpath.files.collect { it.absolutePath }, classesDirs: selected.testClassesDirs.files.collect { it.absolutePath }, properties: properties, jvmArgs: selected.jvmArgs.collect { it.toString() }, maxHeapSize: selected.maxHeapSize, includes: selected.includes.toList(), excludes: selected.excludes.toList()]
+        }
+        println 'QMP_TEST_MODEL=' + groovy.json.JsonOutput.toJson(model)
+    }
+}
+
+// Public source snapshot: upstream service publishing is deliberately disabled.
+tasks.matching { it.name.startsWith('publish') || it.name.startsWith('curseforge') || it.name.startsWith('modrinth') }.configureEach { enabled = false }

@@ -1,0 +1,1 @@
+[{"modid":"ocpp_vmintegration","name":"OC++ VM Integration","description":"SuperBIOS compatible API1 and API2 offline protocol foundation. No QEMU binaries, listeners or guest execution.","version":"0.2.0-dev.2","mcversion":"1.12.2","authorList":["OpenComputers++ private development"],"dependencies":["opencomputers"]}]

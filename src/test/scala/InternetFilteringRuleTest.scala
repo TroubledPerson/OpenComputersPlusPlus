@@ -65,7 +65,10 @@ class InternetFilteringRuleTest extends FunSpec with MockitoSugar {
 
   def isUriBlacklisted(uri: String): Boolean = {
     val uriObj = new java.net.URI(uri)
-    val resolved = InetAddress.getByName(uriObj.getHost)
+    // Deterministic fixture: no external DNS or service connections in this suite.
+    val resolved = if (uriObj.getHost == "google.com") InetAddress.getByAddress(Array[Byte](8, 8, 8, 8))
+      else if (uriObj.getHost == "localhost") InetAddress.getByAddress(Array[Byte](127, 0, 0, 1))
+      else InetAddress.getByName(uriObj.getHost) // Numeric literals, including unusual IPv4 syntax.
     !InternetCard.isRequestAllowed(settings, resolved, uriObj.getHost)
   }
 

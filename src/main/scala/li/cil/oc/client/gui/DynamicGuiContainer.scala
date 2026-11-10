@@ -100,13 +100,29 @@ abstract class DynamicGuiContainer[C <: Container](container: C) extends CustomG
         if (!slot.getHasStack) {
           slot match {
             case component: ComponentSlot =>
-              if (component.tierIcon != null) {
+              GlStateManager.color(1, 1, 1, 1)
+              val extendedTier = component.tier >= 4 && component.tier <= 6
+              if (!extendedTier && component.tierIcon != null) {
                 Textures.bind(component.tierIcon)
                 Gui.drawModalRectWithCustomSizedTexture(slot.xPos, slot.yPos, 0, 0, 16, 16, 16, 16)
               }
               if (component.hasBackground) {
+                RenderState.makeItBlend()
+                GlStateManager.color(1, 1, 1, 1)
                 Textures.bind(slot.getBackgroundLocation)
                 Gui.drawModalRectWithCustomSizedTexture(slot.xPos, slot.yPos, 0, 0, 16, 16, 16, 16)
+              }
+              if (extendedTier) {
+                // Draw the numeral over the blended ghost, as a foreground badge.
+                val glyph = li.cil.oc.plusplus.SlotTierLabel.rows(component.tier)
+                val left = slot.xPos + 15 - glyph(0).length
+                for (y <- glyph.indices; x <- glyph(y).indices if glyph(y)(x) == '#') {
+                  Gui.drawRect(left + x, slot.yPos + 10 + y, left + x + 1, slot.yPos + 11 + y,
+                    li.cil.oc.plusplus.SlotTierLabel.INK)
+                }
+                // Gui.drawRect disables blending and leaves its ink colour set.
+                GlStateManager.color(1, 1, 1, 1)
+                RenderState.makeItBlend()
               }
             case _ =>
           }

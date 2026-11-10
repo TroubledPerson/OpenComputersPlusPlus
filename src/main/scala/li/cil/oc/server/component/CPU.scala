@@ -18,13 +18,29 @@ class CPU(val tier: Int) extends AbstractManagedEnvironment with DeviceInfo {
   override val node = Network.newNode(this, Visibility.Neighbors).
     create()
 
-  private final lazy val deviceInfo = Map(
+  override def getDeviceInfo: util.Map[String, String] = CPU.deviceInfo(tier)
+}
+
+object CPU {
+  def create(tier: Int): AbstractManagedEnvironment =
+    if (tier >= li.cil.oc.plusplus.TierProfiles.FIRST && tier <= li.cil.oc.plusplus.TierProfiles.LAST) new CPUWithData(tier)
+    else new CPU(tier)
+
+  def deviceInfo(tier: Int): util.Map[String, String] = Map(
     DeviceAttribute.Class -> DeviceClass.Processor,
     DeviceAttribute.Description -> "CPU",
     DeviceAttribute.Vendor -> Constants.DeviceInfo.DefaultVendor,
-    DeviceAttribute.Product -> ("FlexiArch " + (tier + 1).toString + " Processor"),
+    DeviceAttribute.Product -> ("FlexiArch " + li.cil.oc.plusplus.TierProfiles.displayTier(tier).toString + " Processor"),
     DeviceAttribute.Clock -> (Settings.get.callBudgets(tier) * 1000).toInt.toString
   )
 
-  override def getDeviceInfo: util.Map[String, String] = deviceInfo
+}
+
+/** One physical CPU slot and one data component, using the CPU's existing node tag.
+  * DataCard.Tier3 inherits T1/T2 callbacks, limits and power accounting unchanged.
+  * Plain saved CPU node addresses load into this component without replacement.
+  */
+class CPUWithData(val tier: Int) extends DataCard.Tier3 {
+  require(tier >= li.cil.oc.plusplus.TierProfiles.FIRST && tier <= li.cil.oc.plusplus.TierProfiles.LAST)
+  override def getDeviceInfo: util.Map[String, String] = CPU.deviceInfo(tier)
 }

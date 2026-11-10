@@ -5,6 +5,7 @@ import li.cil.oc.api.event.FileSystemAccessEvent
 import li.cil.oc.api.internal.Rack
 import li.cil.oc.common.tileentity.Case
 import li.cil.oc.common.tileentity.DiskDrive
+import li.cil.oc.common.tileentity.CDDrive
 import li.cil.oc.common.tileentity.Raid
 import li.cil.oc.server.component.DiskDriveMountable
 import li.cil.oc.server.component.Server
@@ -14,8 +15,17 @@ import net.minecraft.util.SoundEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object FileSystemAccessHandler {
+  // Optical nonempty reads own a bounded activity channel. A legacy filesystem
+  // event must never add a second floppy/HDD voice at that optical position.
+  def isLegacyOpticalSound(tile: net.minecraft.tileentity.TileEntity, name: String): Boolean =
+    tile.isInstanceOf[CDDrive] && (name == Settings.resourceDomain + ":floppy_access" || name == Settings.resourceDomain + ":hdd_access")
+
   @SubscribeEvent
   def onFileSystemAccess(e: FileSystemAccessEvent.Server) {
+    if (isLegacyOpticalSound(e.getTileEntity, e.getSound)) {
+      if (e.isCancelable) e.setCanceled(true)
+      return // Not a read notification: metadata must not synthesize a whirr.
+    }
     e.getTileEntity match {
       case t: Rack =>
         for (slot <- 0 until t.getSizeInventory) {
@@ -41,6 +51,10 @@ object FileSystemAccessHandler {
 
   @SubscribeEvent
   def onFileSystemAccess(e: FileSystemAccessEvent.Client) {
+    if (isLegacyOpticalSound(e.getTileEntity, e.getSound)) {
+      if (e.isCancelable) e.setCanceled(true)
+      return
+    }
     val volume = Settings.get.soundVolume
     val sound = new SoundEvent(new ResourceLocation(e.getSound))
     e.getWorld.playSound(e.getX, e.getY, e.getZ, sound, SoundCategory.BLOCKS, volume, 1, false)

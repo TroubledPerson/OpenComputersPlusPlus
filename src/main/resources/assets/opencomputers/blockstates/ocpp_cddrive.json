@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"opencomputers:ocpp_cddrive"},"facing=south":{"model":"opencomputers:ocpp_cddrive","y":180},"facing=west":{"model":"opencomputers:ocpp_cddrive","y":270},"facing=east":{"model":"opencomputers:ocpp_cddrive","y":90}}}

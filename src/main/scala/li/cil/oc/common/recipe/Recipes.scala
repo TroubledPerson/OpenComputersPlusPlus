@@ -116,7 +116,7 @@ object Recipes {
     oreDictEntries.clear()
 
     try {
-      val recipeSets = Array("default", "hardmode", "gregtech", "peaceful")
+      val recipeSets = Array("default", "plusplus", "optical", "sound", "hardmode", "gregtech", "peaceful")
       val recipeDirectory = new File(Loader.instance.getConfigDir + File.separator + "opencomputers")
       val userRecipes = new File(recipeDirectory, "user.recipes")
       userRecipes.getParentFile.mkdirs()
@@ -502,13 +502,21 @@ object Recipes {
   def addRecipe(recipe: IForgeRegistryEntry.Impl[IRecipe], group: String): IRecipe = GameData.register_impl(recipe.setRegistryName(Settings.resourceDomain, group))
 
   private var recipeCounter: Int = 0
+  private val plusplusRecipeCounters = mutable.Map.empty[String, Int]
 
   def addRecipe(recipe: IForgeRegistryEntry.Impl[IRecipe]): Unit = recipe match {
     case r: IRecipe => r.getRecipeOutput match {
       case stack: ItemStack if !stack.isEmpty =>
-        // Who cares about recipe names?
-        addRecipe(recipe, stack.getItem.getRegistryName.getPath + recipeCounter.toString)
-        recipeCounter += 1
+        Option(Items.get(stack)).map(_.name).filter(_.startsWith("ocpp_")) match {
+          case Some(name) =>
+            // New recipes never advance the legacy counter or rename old recipes.
+            val index = plusplusRecipeCounters.getOrElse(name, 0)
+            addRecipe(recipe, name + "_" + index)
+            plusplusRecipeCounters(name) = index + 1
+          case _ =>
+            addRecipe(recipe, stack.getItem.getRegistryName.getPath + recipeCounter.toString)
+            recipeCounter += 1
+        }
       case _ => throw new IllegalArgumentException("invalid recipe name: " + r.getRecipeOutput)
     }
     case _ => throw new IllegalArgumentException("invalid recipe name: " + recipe)

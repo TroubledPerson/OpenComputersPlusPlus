@@ -230,6 +230,11 @@ public interface TextBuffer extends ManagedEnvironment, Persistable {
      */
     void setForegroundColor(int color, boolean isFromPalette);
 
+    /** Explicit RGBA brush; legacy RGB setters always select alpha 255. */
+    default void setForegroundColorRGBA(int rgb, int alpha) { throw new UnsupportedOperationException("RGBA unavailable"); }
+    default int getForegroundAlpha() { return 255; }
+    default int getForegroundAlpha(int column, int row) { return 255; }
+
     /**
      * The active foreground color.
      */
@@ -264,6 +269,11 @@ public interface TextBuffer extends ManagedEnvironment, Persistable {
      * @param isFromPalette <tt>true</tt>if <tt>color</tt> specifies a palette index.
      */
     void setBackgroundColor(int color, boolean isFromPalette);
+
+    /** Explicit RGBA brush; legacy RGB setters always select alpha 255. */
+    default void setBackgroundColorRGBA(int rgb, int alpha) { throw new UnsupportedOperationException("RGBA unavailable"); }
+    default int getBackgroundAlpha() { return 255; }
+    default int getBackgroundAlpha(int column, int row) { return 255; }
 
     /**
      * The active background color.
@@ -652,6 +662,9 @@ public interface TextBuffer extends ManagedEnvironment, Persistable {
         /**
          * 240 colors, 16 color palette, defaults to grayscale.
          */
-        EightBit
+        EightBit,
+        SixteenBit,
+        TwentyFourBit,
+        ThirtyTwoBit
     }
 }
