@@ -49,15 +49,6 @@
       }
     ]
   },
-  "ocpp_cd_read": {
-    "category": "block",
-    "sounds": [
-      {
-        "name": "opencomputers:ocpp/cd_read",
-        "stream": true
-      }
-    ]
-  },
   "ocpp_cd_motor": {
     "category": "block",
     "sounds": [

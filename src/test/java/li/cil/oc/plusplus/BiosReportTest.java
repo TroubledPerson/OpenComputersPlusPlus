@@ -28,6 +28,6 @@ public class BiosReportTest {
   assertFalse(state.openAudio(epoch-1,true));assertFalse(state.openAudio(epoch,false));assertTrue(state.openAudio(epoch,true));assertEquals(BiosBootState.Page.AUDIO,state.page());assertEquals(4,BiosBootState.actionAt(4,.5,.9));assertTrue(state.key(BiosBootState.Key.BACK,epoch,true));assertEquals(BiosBootState.Page.DIAGNOSTICS,state.page());assertFalse(state.mayExecuteGuest());
  }
  @Test public void readingEventAndFiniteIdlePolicyAreUnchanged(){
-  assertEquals("ocpp_cd_read",OpticalSoundSchedule.EVENTS[OpticalSoundSchedule.READ]);OpticalSoundSchedule s=new OpticalSoundSchedule();s.requestRead();assertEquals(OpticalSoundSchedule.READ,s.tick(0,true));for(int tick=1;tick<=12;tick++)assertEquals(-1,s.tick(tick,true));assertEquals(OpticalSoundSchedule.STOP,s.tick(13,true));assertEquals(-1,s.tick(14,true));assertEquals(740,OpticalSoundSchedule.MAX_TICKS[OpticalSoundSchedule.READ]);
+  assertEquals("ocpp_cd_seek",OpticalSoundSchedule.EVENTS[OpticalSoundSchedule.READ]);OpticalSoundSchedule s=new OpticalSoundSchedule();s.requestRead();assertEquals(OpticalSoundSchedule.READ,s.tick(0,true));for(int tick=1;tick<=12;tick++)assertEquals(-1,s.tick(tick,true));assertEquals(OpticalSoundSchedule.STOP,s.tick(13,true));assertEquals(-1,s.tick(14,true));assertEquals(740,OpticalSoundSchedule.MAX_TICKS[OpticalSoundSchedule.READ]);
  }
 }

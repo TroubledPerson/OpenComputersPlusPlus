@@ -10,17 +10,5 @@ cd-effects-provenance.json; no independent publisher byte-hash match is claimed.
 The former Pixabay tray effects are no longer the proposed tray resources;
 their original bytes and prior notice/provenance are preserved privately.
 
-Unchanged legacy reading resource cd_read.ogg: Cd rom reading cd,
-supersnd (Freesound)/freesound_community, Pixabay asset 70282.
-https://pixabay.com/sound-effects/technology-cd-rom-reading-cd-70282/
-Pixabay Content License and Terms, separately from MIT and the CC0 tray sounds:
-https://pixabay.com/service/terms/
-https://pixabay.com/service/faq/
-Integrated registered mod resource; not a standalone sound collection. The FAQ
-lists incorporation into an app/game as an example of a greater creative work;
-the Terms prohibit standalone content distribution. Preserve its separate
-notice/provenance; do not claim MIT, CC0 or Public Domain covers cd_read.ogg.
-These sources give no GitHub-raw-file-specific ruling or legal guarantee.
-
 Other code and audio component licences remain unchanged. FFmpeg is an existing
 build tool, not a bundled mod dependency. No native runtime is added here.

@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** One pending-read bit, no audio data or queue on the server. Tick-thread policy. */
 public final class OpticalSoundSchedule {
     public static final int OPEN=0, CLOSE=1, READ=2, STOP=3, MAX_CLIENT_DRIVES=8;
-    public static final String[] EVENTS={"ocpp_cd_open","ocpp_cd_close","ocpp_cd_read"};
+    public static final String[] EVENTS={"ocpp_cd_open","ocpp_cd_close","ocpp_cd_seek"};
     public static final int[] MAX_TICKS={42,42,740};
     private final AtomicBoolean pending=new AtomicBoolean();
     private long lastTick=Long.MIN_VALUE,lastRead=Long.MIN_VALUE,lastPulse=Long.MIN_VALUE,blockedUntil=Long.MIN_VALUE;

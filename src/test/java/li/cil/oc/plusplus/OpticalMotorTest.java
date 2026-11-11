@@ -33,7 +33,7 @@ public class OpticalMotorTest {
   OpticalMotorVoices b=new OpticalMotorVoices();for(int i=0;i<8;i++){assertTrue(b.admit(i));assertTrue(b.admit(i));}assertEquals(8,b.size());assertFalse(b.admit(8));b.release(3);assertTrue(b.admit(8));assertEquals(8,b.size());b.clear();assertEquals(0,b.size());
  }
  @Test public void readClickScheduleAndAssetEventRemainIndependentOfMotor(){
-  OpticalSoundSchedule reads=new OpticalSoundSchedule();OpticalMotorState motor=new OpticalMotorState();assertEquals(0,motor.tick(0,true,true,true));reads.requestRead();assertEquals(2,reads.tick(0,true));assertEquals(3,reads.tick(13,true));assertTrue(motor.active());assertEquals("ocpp_cd_read",OpticalSoundSchedule.EVENTS[2]);assertEquals(8,OpticalSoundSchedule.MAX_CLIENT_DRIVES);
+  OpticalSoundSchedule reads=new OpticalSoundSchedule();OpticalMotorState motor=new OpticalMotorState();assertEquals(0,motor.tick(0,true,true,true));reads.requestRead();assertEquals(2,reads.tick(0,true));assertEquals(3,reads.tick(13,true));assertTrue(motor.active());assertEquals("ocpp_cd_seek",OpticalSoundSchedule.EVENTS[2]);assertEquals(8,OpticalSoundSchedule.MAX_CLIENT_DRIVES);
  }
  @Test public void clockRollbackCancelsRatherThanLeakingPreviousControlState(){OpticalMotorState s=new OpticalMotorState();s.tick(100,true,true,true);assertEquals(2,s.tick(1,true,true,true));assertFalse(s.active());}
 }

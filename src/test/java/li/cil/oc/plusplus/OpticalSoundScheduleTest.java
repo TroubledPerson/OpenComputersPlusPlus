@@ -24,7 +24,7 @@ public class OpticalSoundScheduleTest {
   OpticalSoundSchedule s=new OpticalSoundSchedule();for(int i=0;i<1000;i++)s.requestRead();assertEquals(2,s.tick(0,true));assertEquals(-1,s.tick(1,true));assertEquals(3,s.tick(13,true));
  }
  @Test public void fixedEventsAndClientBoundsHaveNoLoopOrUnboundedDuration(){
-  assertArrayEquals(new String[]{"ocpp_cd_open","ocpp_cd_close","ocpp_cd_read"},OpticalSoundSchedule.EVENTS);
+  assertArrayEquals(new String[]{"ocpp_cd_open","ocpp_cd_close","ocpp_cd_seek"},OpticalSoundSchedule.EVENTS);
   assertArrayEquals(new int[]{42,42,740},OpticalSoundSchedule.MAX_TICKS);assertEquals(8,OpticalSoundSchedule.MAX_CLIENT_DRIVES);assertEquals(3,OpticalSoundSchedule.STOP);
  }
  @Test public void deferredBurstHasBoundedLeaseAndNeverPlaysWithoutARead(){

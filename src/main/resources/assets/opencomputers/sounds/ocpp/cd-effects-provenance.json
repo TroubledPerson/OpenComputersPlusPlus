@@ -19,14 +19,6 @@
       "bitDepth": 16,
       "durationSeconds": 3.8587708333333333,
       "identityLimit": "Owner-supplied selected recording; format agrees with source page. No independent publisher byte hash verified."
-    },
-    {
-      "id": 70282,
-      "sha256": "1df86c01f3e54c71c4c5b79100df21140d36b847d1f55bece17ba3dd42ec8b5b",
-      "author": "supersnd (Freesound), freesound_community",
-      "url": "https://pixabay.com/sound-effects/technology-cd-rom-reading-cd-70282/",
-      "license": "Pixabay Content License",
-      "licenseUrl": "https://pixabay.com/service/terms/"
     }
   ],
   "assets": [
@@ -73,22 +65,6 @@
       "sha256": "7d189276991adf493c3246e273b5aab76f69143b5f5e53bd4cf210a06c10e02b",
       "license": "CC0-1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
-    },
-    {
-      "event": "ocpp_cd_read",
-      "file": "cd_read.ogg",
-      "sourceId": 70282,
-      "sourceStartSeconds": 0,
-      "sourceEndSeconds": 36.101219,
-      "durationSeconds": 36.101224,
-      "sampleRate": 22050,
-      "channels": 1,
-      "codec": "vorbis",
-      "decodedPeakDb": -3.1,
-      "sha256": "f93f51af9b3d9485687d989335e14d4a1883503d75de25e8566fbb91cd045112",
-      "license": "Pixabay Content License",
-      "licenseUrl": "https://pixabay.com/service/terms/",
-      "processing": "22.05kHz mono Vorbis quality3; loudnorm I=-24 TP=-3 LRA7;25ms fade in,50ms fade out; final duration trim removes filter padding; full reading source, no loop splice"
     }
   ]
 }
