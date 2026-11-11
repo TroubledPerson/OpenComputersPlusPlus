@@ -1,0 +1,118 @@
+{
+  "name": "Main OC++ prerelease",
+  "on": {
+    "push": {
+      "branches": [
+        "ocpp-dev33"
+      ],
+      "paths": [
+        "src/main/**",
+        "audio-libs/**",
+        "network-libs/**",
+        "gradle/**",
+        "gradlew",
+        "gradlew.bat",
+        "build.gradle",
+        "settings.gradle",
+        "build.properties",
+        "gradle.properties"
+      ]
+    },
+    "workflow_dispatch": {}
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "main-prerelease-${{ github.ref }}",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "build": {
+      "if": "github.repository == 'TroubledPerson/OpenComputersPlusPlus' && github.ref == 'refs/heads/ocpp-dev33'",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 45,
+      "permissions": {
+        "contents": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "ref": "${{ github.sha }}"
+          }
+        },
+        {
+          "uses": "actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961",
+          "with": {
+            "distribution": "temurin",
+            "java-version": "8"
+          }
+        },
+        {
+          "name": "Verify wrapper integrity",
+          "shell": "bash",
+          "run": "python3 - <<'PY'\nfrom pathlib import Path\nimport hashlib\nassert hashlib.sha256(Path('gradle/wrapper/gradle-wrapper.jar').read_bytes()).hexdigest() == '080e30657661539701b66827b96eb0043191e0a7a73090e8a57bd6735e5af5c5'\np = Path('gradle/wrapper/gradle-wrapper.properties')\ns = p.read_text()\nv = dict(line.split('=', 1) for line in s.splitlines() if '=' in line)\nassert v['distributionUrl'].replace('\\:', ':') == 'https://services.gradle.org/distributions/gradle-7.6.6-bin.zip'\nchecksum = '673d9776f303bc7048fc3329d232d6ebf1051b07893bd9d11616fad9a8673be0'\nassert v.get('distributionSha256Sum', checksum) == checksum\nif 'distributionSha256Sum' not in v: p.write_text(s + '\\ndistributionSha256Sum=' + checksum + '\\n')\nPY"
+        },
+        {
+          "name": "Test release gates",
+          "run": "python3 -B tools/ci/test_main_release.py"
+        },
+        {
+          "name": "Build main JAR only",
+          "shell": "bash",
+          "run": "cat > \"$RUNNER_TEMP/ocpp-main-only.gradle\" <<'GROOVY'\ngradle.taskGraph.whenReady { graph ->\n    graph.allTasks.each { task ->\n        def n = task.name.toLowerCase()\n        if (n.contains('companion') || n.contains('qemu') ||\n            ['test','compiletestjava','compiletestscala','onejartest','runclient','runserver'].contains(n) ||\n            n.startsWith('publish') || n.startsWith('curseforge') || n.startsWith('modrinth')) {\n            throw new GradleException('Non-main task refused: ' + task.path)\n        }\n    }\n}\nGROOVY\nbash ./gradlew --no-daemon --max-workers=1 --console=plain -Dorg.gradle.jvmargs=-Xmx2g --init-script \"$RUNNER_TEMP/ocpp-main-only.gradle\" jar reobfJar"
+        },
+        {
+          "name": "Validate main artifact and source notices",
+          "run": "python3 -B tools/ci/verify_main_release.py \"$GITHUB_SHA\" release-bundle"
+        },
+        {
+          "uses": "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "with": {
+            "name": "main-prerelease-${{ github.run_id }}",
+            "path": "release-bundle/*",
+            "if-no-files-found": "error",
+            "retention-days": 7,
+            "compression-level": 0,
+            "archive": true
+          }
+        }
+      ]
+    },
+    "release": {
+      "if": "github.repository == 'TroubledPerson/OpenComputersPlusPlus' && github.ref == 'refs/heads/ocpp-dev33'",
+      "needs": "build",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 10,
+      "permissions": {
+        "contents": "write"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "ref": "${{ github.sha }}"
+          }
+        },
+        {
+          "uses": "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+          "with": {
+            "name": "main-prerelease-${{ github.run_id }}",
+            "path": "release-bundle",
+            "digest-mismatch": "error"
+          }
+        },
+        {
+          "name": "Publish verified prerelease",
+          "run": "python3 -B tools/ci/publish_main_release.py release-bundle",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -20,7 +20,7 @@ The tray-open and tray-close effects are derived from [Ryding's CC0 recording](h
 
 Private build caches, logs, screenshots, local test evidence, machine-specific build drivers, and historical binary/source release fixtures are excluded. The source still contains regression tests that require those historical fixtures. See [source test prerequisites](SOURCE-TEST-PREREQUISITES.md). Their historical test results do not establish that a fresh public checkout passes the full suite.
 
-No fresh game session, native VM, audio device, or full clean build has been run as part of publication preparation. Upstream service-publishing tasks are disabled and the upstream CurseForge/Modrinth project IDs have been cleared. No automated release/upload workflow is included.
+No fresh game session, native VM, audio device, or full clean build has been run as part of publication preparation. Upstream service-publishing tasks are disabled and the upstream CurseForge/Modrinth project IDs have been cleared. Future main-source pushes use the [main-only prerelease workflow](docs/AUTOMATED-PRERELEASES.md); clean-build and runtime qualification remain distinct.
 
 ## Build inputs and licensing
 
