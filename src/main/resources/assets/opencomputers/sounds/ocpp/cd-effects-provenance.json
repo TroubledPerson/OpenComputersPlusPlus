@@ -1,50 +1,78 @@
 {
-  "ownerConfirmedTrayOrder": "first opens, second closes",
+  "licenseScope": "Per-source and per-asset; code MIT does not replace sound licences.",
+  "trayOrder": "Confirmed first action opens, second action closes. Mapping confirmation does not establish tails, level or in-game behavior.",
   "modelAudibleInspection": false,
-  "trimValidation": "Owner labelled events; waveform and four decoded quiet margins below-40dB verified cut locations",
-  "processing": "22.05kHz mono Vorbis quality3; loudnorm I=-24 TP=-3 LRA7;25ms fade in,50ms fade out; final duration trim removes filter padding; full reading source, no loop splice",
+  "trimValidation": "Waveform envelope: first action through 1.56s, second onset near 1.77s; retained 1.74-3.83s fits 42-tick cap. No model listening available.",
+  "trayProcessing": "Stereo average to mono; 10ms/25ms half-cosine fades; constant sample peak normalization to -3dBFS; 22.05kHz Vorbis quality3. No EQ, denoise, compression, time stretch or pitch change.",
   "sources": [
     {
-      "id": 605300,
-      "sha256": "0436282f41df08f4fc6f5af8a58687ecf10d49240e3aa07561ce58fd39991c4b",
-      "author": "tohubohu",
-      "url": "https://pixabay.com/sound-effects/film-special-effects-dvd-player-open-and-close-605300/"
+      "id": 109308,
+      "author": "Ryding",
+      "url": "https://freesound.org/people/Ryding/sounds/109308/",
+      "title": "CD-tray, open & close.wav",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sha256": "06a7ba0b9f0c6427de43aac0b64a497ba0c1a384b0c04d7c19e6f063cc98018c",
+      "bytes": 740928,
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitDepth": 16,
+      "durationSeconds": 3.8587708333333333,
+      "identityLimit": "Owner-supplied selected recording; format agrees with source page. No independent publisher byte hash verified."
     },
     {
       "id": 70282,
       "sha256": "1df86c01f3e54c71c4c5b79100df21140d36b847d1f55bece17ba3dd42ec8b5b",
       "author": "supersnd (Freesound), freesound_community",
-      "url": "https://pixabay.com/sound-effects/technology-cd-rom-reading-cd-70282/"
+      "url": "https://pixabay.com/sound-effects/technology-cd-rom-reading-cd-70282/",
+      "license": "Pixabay Content License",
+      "licenseUrl": "https://pixabay.com/service/terms/"
     }
   ],
-  "license": "Pixabay Content License",
-  "licenseUrl": "https://pixabay.com/service/license-summary/",
   "assets": [
     {
       "event": "ocpp_cd_open",
       "file": "cd_open.ogg",
-      "sourceId": 605300,
-      "sourceStartSeconds": 0.2,
-      "sourceEndSeconds": 2.15,
-      "durationSeconds": 1.950023,
+      "sourceId": 109308,
+      "sourceStartSeconds": 0.04,
+      "sourceEndSeconds": 1.56,
+      "sourceStartFrame": 1920,
+      "sourceEndFrameExclusive": 74880,
+      "durationSeconds": 1.52,
+      "decodedFrames": 33516,
       "sampleRate": 22050,
       "channels": 1,
       "codec": "vorbis",
-      "decodedPeakDb": -4.6,
-      "sha256": "01e9e25e8a9d5a1c6a8a95685a7e1116ac30942056bd7f2df43373833969cb04"
+      "quality": 3,
+      "constantGainDb": -0.7681617724704913,
+      "decodedPeakDb": -2.901288843105563,
+      "decodedRmsDb": -23.64808538453743,
+      "bytes": 11942,
+      "sha256": "e23aa9c3fd84cad80abedb56ca39196d324dff3a8c829cff37558d6e9632b53b",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     {
       "event": "ocpp_cd_close",
       "file": "cd_close.ogg",
-      "sourceId": 605300,
-      "sourceStartSeconds": 4.5,
-      "sourceEndSeconds": 6.5,
-      "durationSeconds": 2.0,
+      "sourceId": 109308,
+      "sourceStartSeconds": 1.74,
+      "sourceEndSeconds": 3.83,
+      "sourceStartFrame": 83520,
+      "sourceEndFrameExclusive": 183840,
+      "durationSeconds": 2.0900226757369613,
+      "decodedFrames": 46085,
       "sampleRate": 22050,
       "channels": 1,
       "codec": "vorbis",
-      "decodedPeakDb": -2.4,
-      "sha256": "1ab3c64bb8c1da29c8bfdf15c005a2ace634f068095d165ace24583fbf4b5283"
+      "quality": 3,
+      "constantGainDb": -2.999734923639621,
+      "decodedPeakDb": -3.2352232040506204,
+      "decodedRmsDb": -26.401175543652858,
+      "bytes": 14198,
+      "sha256": "7d189276991adf493c3246e273b5aab76f69143b5f5e53bd4cf210a06c10e02b",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
     {
       "event": "ocpp_cd_read",
@@ -57,7 +85,10 @@
       "channels": 1,
       "codec": "vorbis",
       "decodedPeakDb": -3.1,
-      "sha256": "f93f51af9b3d9485687d989335e14d4a1883503d75de25e8566fbb91cd045112"
+      "sha256": "f93f51af9b3d9485687d989335e14d4a1883503d75de25e8566fbb91cd045112",
+      "license": "Pixabay Content License",
+      "licenseUrl": "https://pixabay.com/service/terms/",
+      "processing": "22.05kHz mono Vorbis quality3; loudnorm I=-24 TP=-3 LRA7;25ms fade in,50ms fade out; final duration trim removes filter padding; full reading source, no loop splice"
     }
   ]
 }
