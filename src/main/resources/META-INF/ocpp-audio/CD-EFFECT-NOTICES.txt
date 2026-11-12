@@ -12,3 +12,8 @@ their original bytes and prior notice/provenance are preserved privately.
 
 Other code and audio component licences remain unchanged. FFmpeg is an existing
 build tool, not a bundled mod dependency. No native runtime is added here.
+
+Close-onset revision: retain source seconds 2.52-3.83 of the same CC0 recording,
+removing 0.78s of quiet lead within the second tray action. Existing fixed gain,
+10/25ms endpoint fades and Vorbis settings retained. No pitch/EQ processing.
+This source edit has not been tested in-game.

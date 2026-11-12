@@ -48,23 +48,29 @@
       "event": "ocpp_cd_close",
       "file": "cd_close.ogg",
       "sourceId": 109308,
-      "sourceStartSeconds": 1.74,
+      "sourceStartSeconds": 2.52,
       "sourceEndSeconds": 3.83,
-      "sourceStartFrame": 83520,
+      "sourceStartFrame": 120960,
       "sourceEndFrameExclusive": 183840,
-      "durationSeconds": 2.0900226757369613,
-      "decodedFrames": 46085,
+      "durationSeconds": 1.3100226757369615,
+      "decodedFrames": 28886,
       "sampleRate": 22050,
       "channels": 1,
       "codec": "vorbis",
       "quality": 3,
       "constantGainDb": -2.999734923639621,
-      "decodedPeakDb": -3.2352232040506204,
-      "decodedRmsDb": -26.401175543652858,
-      "bytes": 14198,
-      "sha256": "7d189276991adf493c3246e273b5aab76f69143b5f5e53bd4cf210a06c10e02b",
+      "decodedPeakDb": -3.154677949747958,
+      "decodedRmsDb": -24.719683543204077,
+      "bytes": 10799,
+      "sha256": "b6956f58acfc4d7203b428d229034c8d103a4140f6ba765921e1ac0cd60154ad",
       "license": "CC0-1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
     }
-  ]
+  ],
+  "closeOnsetCorrection": {
+    "removedQuietLeadSeconds": 0.78,
+    "operation": "Start later within the same second recorded tray action; retain end, fixed gain, 10/25ms endpoint fades and Vorbis format. No EQ, denoise, compression or pitch change.",
+    "evidence": "Previous clip contains low-level early movement before the larger peak group around 0.8s. CLOSE dispatch has no intentional one-second wait; runtime scheduling/device latency is unmeasured.",
+    "runtimeAuditionRequired": true
+  }
 }
