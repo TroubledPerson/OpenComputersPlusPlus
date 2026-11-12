@@ -1,0 +1,72 @@
+{
+  "name": "File-only Forge input qualification",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "expected_sha": {
+          "description": "Exact reviewed source commit (40 lowercase hex)",
+          "required": true,
+          "type": "string"
+        }
+      }
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "forge-file-input-qualification",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "qualify": {
+      "if": "github.repository == 'TroubledPerson/OpenComputersPlusPlus' && github.ref == 'refs/heads/ocpp-dev33' && github.event_name == 'workflow_dispatch' && github.actor_id == '89006981' && inputs.expected_sha == github.sha && github.workflow_sha == github.sha",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 15,
+      "steps": [
+        {
+          "id": "source",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "ref": "${{ github.sha }}",
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961",
+          "with": {
+            "distribution": "temurin",
+            "java-version": "8"
+          }
+        },
+        {
+          "name": "Check audited source identity",
+          "env": {
+            "EXPECTED_SOURCE_SHA": "${{ inputs.expected_sha }}"
+          },
+          "run": "python3 - <<'PY'\nimport os,re\ns=os.environ['EXPECTED_SOURCE_SHA']\nassert re.fullmatch('[0-9a-f]{40}',s) and s==os.environ['GITHUB_SHA']\nPY"
+        },
+        {
+          "name": "Verify public toolchain and frozen runtime pins",
+          "run": "python3 -B qualification/forge-input/runner.py prepare"
+        },
+        {
+          "name": "Fetch and verify private input once",
+          "env": {
+            "OCPP_FORGE_INPUT_URL": "${{ secrets.OCPP_FORGE_INPUT_URL }}"
+          },
+          "run": "python3 -B qualification/forge-input/runner.py fetch"
+        },
+        {
+          "name": "Probe valid missing and corrupt inputs",
+          "run": "python3 -B qualification/forge-input/runner.py probe"
+        },
+        {
+          "name": "Remove owned inputs caches and diagnostics",
+          "if": "always() && steps.source.outcome == 'success'",
+          "run": "python3 -B qualification/forge-input/runner.py cleanup"
+        }
+      ]
+    }
+  }
+}

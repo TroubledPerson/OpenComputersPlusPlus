@@ -1,0 +1,95 @@
+import groovy.json.JsonOutput
+import java.net.*
+import java.security.MessageDigest
+import java.util.concurrent.atomic.AtomicInteger
+import org.gradle.api.Project
+
+class DenyHttp extends URLStreamHandler {
+    static final AtomicInteger opens = new AtomicInteger()
+    protected URLConnection openConnection(URL u) throws IOException {
+        opens.incrementAndGet()
+        throw new IOException('HTTP transport forbidden in file-only probe')
+    }
+}
+def hash = { File f -> MessageDigest.getInstance('SHA-256').digest(f.bytes).encodeHex().toString() }
+tasks.register('qualifyInput') {
+    doLast {
+        def mode=project.property('case')
+        assert ['valid','missing','corrupt'].contains(mode)
+        def root=new File(System.getenv('FGQUAL_ROOT')).canonicalFile
+        def report=[case:mode, origins:[]]
+        def phase='install-tripwire'
+        URLClassLoader loader=null
+        try {
+            // Process-local denial only; no TLS, OS, account or firewall settings change.
+            URL.setURLStreamHandlerFactory({ String scheme ->
+                ['http','https'].contains(scheme) ? new DenyHttp() : null
+            } as URLStreamHandlerFactory)
+            ['http','https'].each { scheme ->
+                try {
+                    new URL(scheme+'://qualification.invalid/').openConnection()
+                    assert false
+                } catch (IOException expected) { }
+            }
+            assert DenyHttp.opens.get()==2
+            DenyHttp.opens.set(0)
+            report.tripwireSelfTests=2
+            phase='class-origins'
+            def paths=System.getenv('FGQUAL_CP').split(File.pathSeparator).collect { new File(it).toURI().toURL() }
+            loader=new URLClassLoader(paths as URL[],Project.class.classLoader)
+            def downloader=Class.forName('net.minecraftforge.gradle.common.util.MavenArtifactDownloader',false,loader)
+            ['net.minecraftforge.gradle.common.util.MavenArtifactDownloader',
+             'net.minecraftforge.gradle.common.util.DownloadUtils',
+             'net.minecraftforge.gradle.common.util.Utils',
+             'net.minecraftforge.gradle.common.util.Artifact',
+             'com.google.gson.Gson','com.google.common.collect.ImmutableList',
+             'org.apache.commons.io.IOUtils','org.apache.maven.artifact.versioning.ComparableVersion'].each { name ->
+                def c=Class.forName(name,false,loader)
+                def source=new File(c.protectionDomain.codeSource.location.toURI()).canonicalFile
+                assert source.toPath().startsWith(root.toPath())
+                assert source.name ==~ /[A-Za-z0-9_.+-]+\.jar/
+                def sha=hash(source)
+                if (name.startsWith('net.minecraftforge.gradle.')) {
+                    assert sha=='61ec654c4c96a535e3543d59cf9ca2722e0d673952dae7067d8948402edb116d'
+                }
+                report.origins << [className:name,file:source.name,sha256:sha]
+            }
+            phase='file-only-repositories'
+            repositories.clear()
+            repositories.maven { url=new File(root,'repo-'+mode).toURI() }
+            assert repositories.size()==1 && repositories.every { it.url.scheme=='file' }
+            phase='manual-resolution'
+            def method=downloader.getMethod('manual',Project.class,String.class,Boolean.TYPE)
+            def f=method.invoke(null,project,'net.minecraftforge:forge:1.12.2-14.23.5.2860:universal',false)
+            assert repositories.size()==1 && repositories.every { it.url.scheme=='file' }
+            phase='identity-boundary'
+            def trusted='cd3fbf85d7ca744507fd6a37a41b90122d43e616a4f8962332b1b658655e8a64'
+            if (mode=='missing') {
+                assert f==null || !f.exists()
+                report.outcome='missing-rejected'
+            } else {
+                assert f!=null && f.exists()
+                def got=hash(f)
+                if (mode=='valid') {
+                    assert got==trusted
+                    report.outcome='valid-accepted'
+                } else {
+                    assert got==new File(root,'corrupt.sha256').text
+                    assert got!=trusted
+                    report.outcome='corrupt-rejected-by-sha256'
+                }
+            }
+            assert DenyHttp.opens.get()==0
+        } catch (Throwable e) {
+            report.failureStage=phase
+            report.errorClass=e.class.name
+            throw new GradleException('File-only qualification rejected')
+        } finally {
+            try { if (loader!=null) loader.close() }
+            finally {
+                report.unexpectedNetworkOpens=DenyHttp.opens.get()
+                file('result.json').text=JsonOutput.toJson(report)
+            }
+        }
+    }
+}

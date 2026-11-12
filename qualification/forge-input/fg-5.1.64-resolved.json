@@ -1,0 +1,889 @@
+{
+    "schema": 1,
+    "scope": "standalone ForgeGradle runtime resolution; no plugin application",
+    "gradle": "7.6.6",
+    "java": "1.8",
+    "requested": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+    "components": [
+        {
+            "coordinate": "com.google.code.findbugs:jsr305:3.0.2",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "com.google.code.gson:gson:2.8.6",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                },
+                {
+                    "cause": "CONFLICT_RESOLUTION",
+                    "description": "between versions 2.8.6 and 2.8.5"
+                }
+            ]
+        },
+        {
+            "coordinate": "com.google.errorprone:error_prone_annotations:2.7.1",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "com.google.guava:failureaccess:1.0.1",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "com.google.guava:guava:31.0.1-jre",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                },
+                {
+                    "cause": "CONFLICT_RESOLUTION",
+                    "description": "between versions 31.0.1-jre and 30.1-jre"
+                }
+            ]
+        },
+        {
+            "coordinate": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "com.google.j2objc:j2objc-annotations:1.3",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "com.machinezoo.noexception:noexception:1.7.1",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "commons-codec:commons-codec:1.11",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "commons-io:commons-io:2.8.0",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "commons-logging:commons-logging:1.2",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "de.siegmar:fastcsv:2.0.0",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "it.unimi.dsi:fastutil:8.3.1",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "net.minecraftforge:DiffPatch:2.0.7",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "net.minecraftforge:JarJarMetadata:0.3.17",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "net.minecraftforge:JarJarSelector:0.3.17",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "net.minecraftforge:artifactural:3.0.10",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "net.minecraftforge:srgutils:0.4.13",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "net.minecraftforge:unsafe:0.2.0",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "net.sf.jopt-simple:jopt-simple:5.0.4",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "org.apache.commons:commons-compress:1.18",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "org.apache.commons:commons-lang3:3.9",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                },
+                {
+                    "cause": "CONFLICT_RESOLUTION",
+                    "description": "between versions 3.9 and 3.8.1"
+                }
+            ]
+        },
+        {
+            "coordinate": "org.apache.httpcomponents:httpclient:4.5.13",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "org.apache.httpcomponents:httpcore:4.4.13",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "org.apache.maven:maven-artifact:3.8.1",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                },
+                {
+                    "cause": "CONFLICT_RESOLUTION",
+                    "description": "between versions 3.8.1 and 3.6.3"
+                }
+            ]
+        },
+        {
+            "coordinate": "org.checkerframework:checker-qual:3.12.0",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "org.codehaus.plexus:plexus-utils:3.2.1",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "org.slf4j:slf4j-api:1.7.30",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "org.slf4j:slf4j-simple:1.7.30",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        },
+        {
+            "coordinate": "org.tukaani:xz:1.8",
+            "reasons": [
+                {
+                    "cause": "REQUESTED",
+                    "description": "requested"
+                }
+            ]
+        }
+    ],
+    "artifacts": [
+        {
+            "coordinate": "com.google.code.findbugs:jsr305:3.0.2",
+            "file": "jsr305-3.0.2.jar",
+            "bytes": 19936,
+            "sha256": "766ad2a0783f2687962c8ad74ceecc38a28b9f72a2d085ee438b7813e928d0c7",
+            "variant": "com.google.code.findbugs:jsr305:3.0.2 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "com.google.code.gson:gson:2.8.6",
+            "file": "gson-2.8.6.jar",
+            "bytes": 240255,
+            "sha256": "c8fb4839054d280b3033f800d1f5a97de2f028eb8ba2eb458ad287e536f3f25f",
+            "variant": "com.google.code.gson:gson:2.8.6 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "com.google.errorprone:error_prone_annotations:2.7.1",
+            "file": "error_prone_annotations-2.7.1.jar",
+            "bytes": 14835,
+            "sha256": "cd5257c08a246cf8628817ae71cb822be192ef91f6881ca4a3fcff4f1de1cff3",
+            "variant": "com.google.errorprone:error_prone_annotations:2.7.1 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "com.google.guava:failureaccess:1.0.1",
+            "file": "failureaccess-1.0.1.jar",
+            "bytes": 4617,
+            "sha256": "a171ee4c734dd2da837e4b16be9df4661afab72a41adaf31eb84dfdaf936ca26",
+            "variant": "com.google.guava:failureaccess:1.0.1 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "com.google.guava:guava:31.0.1-jre",
+            "file": "guava-31.0.1-jre.jar",
+            "bytes": 2974216,
+            "sha256": "d5be94d65e87bd219fb3193ad1517baa55a3b88fc91d21cf735826ab5af087b9",
+            "variant": "com.google.guava:guava:31.0.1-jre configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava",
+            "file": "listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar",
+            "bytes": 2199,
+            "sha256": "b372a037d4230aa57fbeffdef30fd6123f9c0c2db85d0aced00c91b974f33f99",
+            "variant": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "com.google.j2objc:j2objc-annotations:1.3",
+            "file": "j2objc-annotations-1.3.jar",
+            "bytes": 8781,
+            "sha256": "21af30c92267bd6122c0e0b4d20cccb6641a37eaf956c6540ec471d584e64a7b",
+            "variant": "com.google.j2objc:j2objc-annotations:1.3 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "com.machinezoo.noexception:noexception:1.7.1",
+            "file": "noexception-1.7.1.jar",
+            "bytes": 250861,
+            "sha256": "3d70aaea3904918587a21bdf99ab6ade9ab1dd0eaf6119344ba513f60f575816",
+            "variant": "com.machinezoo.noexception:noexception:1.7.1 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "commons-codec:commons-codec:1.11",
+            "file": "commons-codec-1.11.jar",
+            "bytes": 335042,
+            "sha256": "e599d5318e97aa48f42136a2927e6dfa4e8881dff0e6c8e3109ddbbff51d7b7d",
+            "variant": "commons-codec:commons-codec:1.11 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "commons-io:commons-io:2.8.0",
+            "file": "commons-io-2.8.0.jar",
+            "bytes": 285424,
+            "sha256": "02f291e5d1243dc143496e3cbbb40a1ced47aa58f2d633d3e38780cd068d5074",
+            "variant": "commons-io:commons-io:2.8.0 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "commons-logging:commons-logging:1.2",
+            "file": "commons-logging-1.2.jar",
+            "bytes": 61829,
+            "sha256": "daddea1ea0be0f56978ab3006b8ac92834afeefbd9b7e4e6316fca57df0fa636",
+            "variant": "commons-logging:commons-logging:1.2 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "de.siegmar:fastcsv:2.0.0",
+            "file": "fastcsv-2.0.0.jar",
+            "bytes": 29476,
+            "sha256": "665d52cb6f35ca236919be9ac81653c208628507f91d6bf13479bc11496db616",
+            "variant": "de.siegmar:fastcsv:2.0.0 variant runtimeElements",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.category": "library",
+                "org.gradle.dependency.bundling": "external",
+                "org.gradle.jvm.version": "8",
+                "org.gradle.libraryelements": "jar",
+                "org.gradle.status": "release",
+                "org.gradle.usage": "java-runtime"
+            }
+        },
+        {
+            "coordinate": "it.unimi.dsi:fastutil:8.3.1",
+            "file": "fastutil-8.3.1.jar",
+            "bytes": 19011744,
+            "sha256": "1ee5da1ebfdc86ab9574be3cc290769f319df901ae95932a118889b7c63636b9",
+            "variant": "it.unimi.dsi:fastutil:8.3.1 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "file": "ForgeGradle-5.1.64.jar",
+            "bytes": 458322,
+            "sha256": "61ec654c4c96a535e3543d59cf9ca2722e0d673952dae7067d8948402edb116d",
+            "variant": "net.minecraftforge.gradle:ForgeGradle:5.1.64 variant runtimeElements",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.category": "library",
+                "org.gradle.dependency.bundling": "external",
+                "org.gradle.jvm.version": "8",
+                "org.gradle.libraryelements": "jar",
+                "org.gradle.status": "release",
+                "org.gradle.usage": "java-runtime"
+            }
+        },
+        {
+            "coordinate": "net.minecraftforge:DiffPatch:2.0.7",
+            "file": "DiffPatch-2.0.7-all.jar",
+            "bytes": 1361384,
+            "sha256": "f5bf387fba596fcd21c5b6d0b455895be66b45c824c7a346f90791c5347d2de0",
+            "variant": "net.minecraftforge:DiffPatch:2.0.7",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "net.minecraftforge:JarJarMetadata:0.3.17",
+            "file": "JarJarMetadata-0.3.17.jar",
+            "bytes": 15894,
+            "sha256": "62cf7a5fe9a6c141ef5dba667dc6102384d1e6b75a54ed5f4dc7b99c610985c5",
+            "variant": "net.minecraftforge:JarJarMetadata:0.3.17 variant runtimeElements",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.category": "library",
+                "org.gradle.dependency.bundling": "external",
+                "org.gradle.jvm.version": "8",
+                "org.gradle.libraryelements": "jar",
+                "org.gradle.status": "release",
+                "org.gradle.usage": "java-runtime"
+            }
+        },
+        {
+            "coordinate": "net.minecraftforge:JarJarSelector:0.3.17",
+            "file": "JarJarSelector-0.3.17.jar",
+            "bytes": 17374,
+            "sha256": "bc26087e1cf09c5b18d1cfc337b9af502eb7465c1847c03f74492e97ea0b70b3",
+            "variant": "net.minecraftforge:JarJarSelector:0.3.17 variant runtimeElements",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.category": "library",
+                "org.gradle.dependency.bundling": "external",
+                "org.gradle.jvm.version": "8",
+                "org.gradle.libraryelements": "jar",
+                "org.gradle.status": "release",
+                "org.gradle.usage": "java-runtime"
+            }
+        },
+        {
+            "coordinate": "net.minecraftforge:artifactural:3.0.10",
+            "file": "artifactural-3.0.10.jar",
+            "bytes": 58181,
+            "sha256": "208ac8cd967ea48d0d68e2fd56caef236cc4e8a190bea20f8559904b6e7d3958",
+            "variant": "net.minecraftforge:artifactural:3.0.10 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "net.minecraftforge:srgutils:0.4.13",
+            "file": "srgutils-0.4.13.jar",
+            "bytes": 69297,
+            "sha256": "18d43f743ead47e511f3e3765dc1208d0929d1aed73b2e83d056a3e08f6dd223",
+            "variant": "net.minecraftforge:srgutils:0.4.13 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "net.minecraftforge:unsafe:0.2.0",
+            "file": "unsafe-0.2.0.jar",
+            "bytes": 2834,
+            "sha256": "946937e182ab3b518b5b88264f367e1f35ac12bc83abed220490c60c717be239",
+            "variant": "net.minecraftforge:unsafe:0.2.0 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "net.sf.jopt-simple:jopt-simple:5.0.4",
+            "file": "jopt-simple-5.0.4.jar",
+            "bytes": 78146,
+            "sha256": "df26cc58f235f477db07f753ba5a3ab243ebe5789d9f89ecf68dd62ea9a66c28",
+            "variant": "net.sf.jopt-simple:jopt-simple:5.0.4 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "org.apache.commons:commons-compress:1.18",
+            "file": "commons-compress-1.18.jar",
+            "bytes": 591748,
+            "sha256": "5f2df1e467825e4cac5996d44890c4201c000b43c0b23cffc0782d28a0beb9b0",
+            "variant": "org.apache.commons:commons-compress:1.18 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "org.apache.commons:commons-lang3:3.9",
+            "file": "commons-lang3-3.9.jar",
+            "bytes": 503880,
+            "sha256": "de2e1dcdcf3ef917a8ce858661a06726a9a944f28e33ad7f9e08bea44dc3c230",
+            "variant": "org.apache.commons:commons-lang3:3.9 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "org.apache.httpcomponents:httpclient:4.5.13",
+            "file": "httpclient-4.5.13.jar",
+            "bytes": 780321,
+            "sha256": "6fe9026a566c6a5001608cf3fc32196641f6c1e5e1986d1037ccdbd5f31ef743",
+            "variant": "org.apache.httpcomponents:httpclient:4.5.13 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "org.apache.httpcomponents:httpcore:4.4.13",
+            "file": "httpcore-4.4.13.jar",
+            "bytes": 328593,
+            "sha256": "e06e89d40943245fcfa39ec537cdbfce3762aecde8f9c597780d2b00c2b43424",
+            "variant": "org.apache.httpcomponents:httpcore:4.4.13 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "org.apache.maven:maven-artifact:3.8.1",
+            "file": "maven-artifact-3.8.1.jar",
+            "bytes": 57836,
+            "sha256": "9dbd3db15ac4816471e72981cb06ef90f3ffa8be6628dddf7135f7bd69bee0c0",
+            "variant": "org.apache.maven:maven-artifact:3.8.1 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "org.checkerframework:checker-qual:3.12.0",
+            "file": "checker-qual-3.12.0.jar",
+            "bytes": 208835,
+            "sha256": "ff10785ac2a357ec5de9c293cb982a2cbb605c0309ea4cc1cb9b9bc6dbe7f3cb",
+            "variant": "org.checkerframework:checker-qual:3.12.0 variant runtimeElements",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.category": "library",
+                "org.gradle.dependency.bundling": "external",
+                "org.gradle.jvm.version": "8",
+                "org.gradle.libraryelements": "jar",
+                "org.gradle.status": "release",
+                "org.gradle.usage": "java-runtime"
+            }
+        },
+        {
+            "coordinate": "org.codehaus.plexus:plexus-utils:3.2.1",
+            "file": "plexus-utils-3.2.1.jar",
+            "bytes": 261801,
+            "sha256": "8d07b497bb8deb167ee5329cae87ef2043833bf52e4f15a5a9379cec447a5b2b",
+            "variant": "org.codehaus.plexus:plexus-utils:3.2.1 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "org.slf4j:slf4j-api:1.7.30",
+            "file": "slf4j-api-1.7.30.jar",
+            "bytes": 41472,
+            "sha256": "cdba07964d1bb40a0761485c6b1e8c2f8fd9eb1d19c53928ac0d7f9510105c57",
+            "variant": "org.slf4j:slf4j-api:1.7.30 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "org.slf4j:slf4j-simple:1.7.30",
+            "file": "slf4j-simple-1.7.30.jar",
+            "bytes": 15239,
+            "sha256": "8b9279cbff6b9f88594efae3cf02039b6995030eec023ed43928748c41670fee",
+            "variant": "org.slf4j:slf4j-simple:1.7.30 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        },
+        {
+            "coordinate": "org.tukaani:xz:1.8",
+            "file": "xz-1.8.jar",
+            "bytes": 108555,
+            "sha256": "8c7964b36fe3f0cbe644b04fcbff84e491ce81917db2f5bfa0cba8e9548aff5d",
+            "variant": "org.tukaani:xz:1.8 configuration default",
+            "attributes": {
+                "artifactType": "jar",
+                "org.gradle.status": "release"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "from": "com.google.guava:guava:31.0.1-jre",
+            "requested": "com.google.code.findbugs:jsr305:3.0.2",
+            "selected": "com.google.code.findbugs:jsr305:3.0.2"
+        },
+        {
+            "from": "com.google.guava:guava:31.0.1-jre",
+            "requested": "com.google.errorprone:error_prone_annotations:2.7.1",
+            "selected": "com.google.errorprone:error_prone_annotations:2.7.1"
+        },
+        {
+            "from": "com.google.guava:guava:31.0.1-jre",
+            "requested": "com.google.guava:failureaccess:1.0.1",
+            "selected": "com.google.guava:failureaccess:1.0.1"
+        },
+        {
+            "from": "com.google.guava:guava:31.0.1-jre",
+            "requested": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava",
+            "selected": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
+        },
+        {
+            "from": "com.google.guava:guava:31.0.1-jre",
+            "requested": "com.google.j2objc:j2objc-annotations:1.3",
+            "selected": "com.google.j2objc:j2objc-annotations:1.3"
+        },
+        {
+            "from": "com.google.guava:guava:31.0.1-jre",
+            "requested": "org.checkerframework:checker-qual:3.12.0",
+            "selected": "org.checkerframework:checker-qual:3.12.0"
+        },
+        {
+            "from": "com.machinezoo.noexception:noexception:1.7.1",
+            "requested": "org.slf4j:slf4j-api:1.7.30",
+            "selected": "org.slf4j:slf4j-api:1.7.30"
+        },
+        {
+            "from": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "requested": "com.google.code.gson:gson:2.8.6",
+            "selected": "com.google.code.gson:gson:2.8.6"
+        },
+        {
+            "from": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "requested": "com.google.guava:guava:30.1-jre",
+            "selected": "com.google.guava:guava:31.0.1-jre"
+        },
+        {
+            "from": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "requested": "commons-io:commons-io:2.8.0",
+            "selected": "commons-io:commons-io:2.8.0"
+        },
+        {
+            "from": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "requested": "de.siegmar:fastcsv:2.0.0",
+            "selected": "de.siegmar:fastcsv:2.0.0"
+        },
+        {
+            "from": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "requested": "net.minecraftforge:DiffPatch:2.0.7",
+            "selected": "net.minecraftforge:DiffPatch:2.0.7"
+        },
+        {
+            "from": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "requested": "net.minecraftforge:JarJarMetadata:0.3.17",
+            "selected": "net.minecraftforge:JarJarMetadata:0.3.17"
+        },
+        {
+            "from": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "requested": "net.minecraftforge:JarJarSelector:0.3.17",
+            "selected": "net.minecraftforge:JarJarSelector:0.3.17"
+        },
+        {
+            "from": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "requested": "net.minecraftforge:artifactural:3.0.10",
+            "selected": "net.minecraftforge:artifactural:3.0.10"
+        },
+        {
+            "from": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "requested": "net.minecraftforge:srgutils:0.4.13",
+            "selected": "net.minecraftforge:srgutils:0.4.13"
+        },
+        {
+            "from": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "requested": "net.minecraftforge:unsafe:0.2.0",
+            "selected": "net.minecraftforge:unsafe:0.2.0"
+        },
+        {
+            "from": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "requested": "org.apache.httpcomponents:httpclient:4.5.13",
+            "selected": "org.apache.httpcomponents:httpclient:4.5.13"
+        },
+        {
+            "from": "net.minecraftforge.gradle:ForgeGradle:5.1.64",
+            "requested": "org.apache.maven:maven-artifact:3.6.3",
+            "selected": "org.apache.maven:maven-artifact:3.8.1"
+        },
+        {
+            "from": "net.minecraftforge:DiffPatch:2.0.7",
+            "requested": "it.unimi.dsi:fastutil:8.3.1",
+            "selected": "it.unimi.dsi:fastutil:8.3.1"
+        },
+        {
+            "from": "net.minecraftforge:DiffPatch:2.0.7",
+            "requested": "net.sf.jopt-simple:jopt-simple:5.0.4",
+            "selected": "net.sf.jopt-simple:jopt-simple:5.0.4"
+        },
+        {
+            "from": "net.minecraftforge:DiffPatch:2.0.7",
+            "requested": "org.apache.commons:commons-compress:1.18",
+            "selected": "org.apache.commons:commons-compress:1.18"
+        },
+        {
+            "from": "net.minecraftforge:DiffPatch:2.0.7",
+            "requested": "org.apache.commons:commons-lang3:3.9",
+            "selected": "org.apache.commons:commons-lang3:3.9"
+        },
+        {
+            "from": "net.minecraftforge:DiffPatch:2.0.7",
+            "requested": "org.tukaani:xz:1.8",
+            "selected": "org.tukaani:xz:1.8"
+        },
+        {
+            "from": "net.minecraftforge:JarJarMetadata:0.3.17",
+            "requested": "com.google.code.gson:gson:2.8.5",
+            "selected": "com.google.code.gson:gson:2.8.6"
+        },
+        {
+            "from": "net.minecraftforge:JarJarMetadata:0.3.17",
+            "requested": "com.google.guava:guava:31.0.1-jre",
+            "selected": "com.google.guava:guava:31.0.1-jre"
+        },
+        {
+            "from": "net.minecraftforge:JarJarMetadata:0.3.17",
+            "requested": "com.machinezoo.noexception:noexception:1.7.1",
+            "selected": "com.machinezoo.noexception:noexception:1.7.1"
+        },
+        {
+            "from": "net.minecraftforge:JarJarMetadata:0.3.17",
+            "requested": "org.apache.maven:maven-artifact:3.8.1",
+            "selected": "org.apache.maven:maven-artifact:3.8.1"
+        },
+        {
+            "from": "net.minecraftforge:JarJarMetadata:0.3.17",
+            "requested": "org.slf4j:slf4j-api:1.7.30",
+            "selected": "org.slf4j:slf4j-api:1.7.30"
+        },
+        {
+            "from": "net.minecraftforge:JarJarMetadata:0.3.17",
+            "requested": "org.slf4j:slf4j-simple:1.7.30",
+            "selected": "org.slf4j:slf4j-simple:1.7.30"
+        },
+        {
+            "from": "net.minecraftforge:JarJarSelector:0.3.17",
+            "requested": "com.google.code.gson:gson:2.8.5",
+            "selected": "com.google.code.gson:gson:2.8.6"
+        },
+        {
+            "from": "net.minecraftforge:JarJarSelector:0.3.17",
+            "requested": "com.google.guava:guava:31.0.1-jre",
+            "selected": "com.google.guava:guava:31.0.1-jre"
+        },
+        {
+            "from": "net.minecraftforge:JarJarSelector:0.3.17",
+            "requested": "com.machinezoo.noexception:noexception:1.7.1",
+            "selected": "com.machinezoo.noexception:noexception:1.7.1"
+        },
+        {
+            "from": "net.minecraftforge:JarJarSelector:0.3.17",
+            "requested": "net.minecraftforge:JarJarMetadata:0.3.17",
+            "selected": "net.minecraftforge:JarJarMetadata:0.3.17"
+        },
+        {
+            "from": "net.minecraftforge:JarJarSelector:0.3.17",
+            "requested": "org.apache.maven:maven-artifact:3.8.1",
+            "selected": "org.apache.maven:maven-artifact:3.8.1"
+        },
+        {
+            "from": "net.minecraftforge:JarJarSelector:0.3.17",
+            "requested": "org.slf4j:slf4j-api:1.7.30",
+            "selected": "org.slf4j:slf4j-api:1.7.30"
+        },
+        {
+            "from": "net.minecraftforge:JarJarSelector:0.3.17",
+            "requested": "org.slf4j:slf4j-simple:1.7.30",
+            "selected": "org.slf4j:slf4j-simple:1.7.30"
+        },
+        {
+            "from": "org.apache.httpcomponents:httpclient:4.5.13",
+            "requested": "commons-codec:commons-codec:1.11",
+            "selected": "commons-codec:commons-codec:1.11"
+        },
+        {
+            "from": "org.apache.httpcomponents:httpclient:4.5.13",
+            "requested": "commons-logging:commons-logging:1.2",
+            "selected": "commons-logging:commons-logging:1.2"
+        },
+        {
+            "from": "org.apache.httpcomponents:httpclient:4.5.13",
+            "requested": "org.apache.httpcomponents:httpcore:4.4.13",
+            "selected": "org.apache.httpcomponents:httpcore:4.4.13"
+        },
+        {
+            "from": "org.apache.maven:maven-artifact:3.8.1",
+            "requested": "org.apache.commons:commons-lang3:3.8.1",
+            "selected": "org.apache.commons:commons-lang3:3.9"
+        },
+        {
+            "from": "org.apache.maven:maven-artifact:3.8.1",
+            "requested": "org.codehaus.plexus:plexus-utils:3.2.1",
+            "selected": "org.codehaus.plexus:plexus-utils:3.2.1"
+        },
+        {
+            "from": "org.slf4j:slf4j-simple:1.7.30",
+            "requested": "org.slf4j:slf4j-api:1.7.30",
+            "selected": "org.slf4j:slf4j-api:1.7.30"
+        }
+    ]
+}
