@@ -1,0 +1,52 @@
+{
+  "name": "Main OC++ release gate checks",
+  "on": {
+    "push": {
+      "branches": [
+        "ocpp-dev33"
+      ],
+      "paths": [
+        ".github/workflows/main-prerelease.yml",
+        ".github/workflows/main-release-gates.yml",
+        "tools/ci/**"
+      ]
+    },
+    "pull_request": {
+      "branches": [
+        "ocpp-dev33"
+      ],
+      "paths": [
+        ".github/workflows/main-prerelease.yml",
+        ".github/workflows/main-release-gates.yml",
+        "tools/ci/**"
+      ]
+    },
+    "workflow_dispatch": {}
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "main-release-gates-${{ github.ref }}",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "gates": {
+      "if": "github.repository == 'TroubledPerson/OpenComputersPlusPlus'",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 5,
+      "steps": [
+        {
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Check artifact gates, fixed lab01 naming and collision handling",
+          "run": "python3 -B tools/ci/test_main_release.py"
+        }
+      ]
+    }
+  }
+}
