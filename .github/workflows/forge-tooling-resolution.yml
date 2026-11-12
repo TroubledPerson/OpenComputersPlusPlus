@@ -1,0 +1,52 @@
+{
+  "name": "Resolve ForgeGradle tooling only",
+  "on": {
+    "push": {
+      "branches": [
+        "ocpp-dev33"
+      ],
+      "paths": [
+        ".github/workflows/forge-tooling-resolution.yml"
+      ]
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "forge-tooling-resolution",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "resolve": {
+      "if": "github.repository == 'TroubledPerson/OpenComputersPlusPlus' && github.ref == 'refs/heads/ocpp-dev33'",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 10,
+      "steps": [
+        {
+          "uses": "actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961",
+          "with": {
+            "distribution": "temurin",
+            "java-version": "8"
+          }
+        },
+        {
+          "name": "Verify isolated Gradle toolchain",
+          "shell": "bash",
+          "run": "set -euo pipefail\nroot=$(mktemp -d \"$RUNNER_TEMP/fgresolve.XXXXXX\")\nprintf 'FGRESOLVE_ROOT=%s\\n' \"$root\" >> \"$GITHUB_ENV\"\npython3 - <<'PY'\nm=dict(line.split(':',1) for line in open('/proc/meminfo'))\nassert int(m['MemAvailable'].split()[0])*1024 >= 1610612736\nPY\ncurl --fail --location --retry 0 --max-time 180 --max-filesize 128439774 --proto '=https' --proto-redir '=https' --silent --show-error https://services.gradle.org/distributions/gradle-7.6.6-bin.zip --output \"$root/gradle.zip\"\ntest \"$(stat -c %s \"$root/gradle.zip\")\" = 128439774\nprintf '%s  %s\\n' 673d9776f303bc7048fc3329d232d6ebf1051b07893bd9d11616fad9a8673be0 \"$root/gradle.zip\" | sha256sum --check --status\nunzip -q \"$root/gradle.zip\" -d \"$root\"\nmkdir \"$root/project\"\nprintf \"rootProject.name='forge-tooling-resolution'\\n\" > \"$root/project/settings.gradle\"\n"
+        },
+        {
+          "name": "Resolve and report public tooling",
+          "shell": "bash",
+          "run": "set -euo pipefail\ncat > \"$FGRESOLVE_ROOT/project/build.gradle\" <<'GROOVY'\nimport groovy.json.JsonOutput\nimport java.security.MessageDigest\nimport org.gradle.api.attributes.java.TargetJvmVersion\nimport org.gradle.api.artifacts.component.ModuleComponentIdentifier\nimport org.gradle.api.artifacts.result.ResolvedDependencyResult\nrepositories {\n    maven {\n        url = uri('https://maven.minecraftforge.net')\n        content { includeGroup('net.minecraftforge.gradle'); includeGroup('net.minecraftforge') }\n    }\n    mavenCentral {\n        content { excludeGroup('net.minecraftforge.gradle'); excludeGroup('net.minecraftforge') }\n    }\n}\nconfigurations {\n    fgRuntime {\n        canBeConsumed = false\n        canBeResolved = true\n        attributes {\n            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))\n            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category, Category.LIBRARY))\n            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, LibraryElements.JAR))\n            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling, Bundling.EXTERNAL))\n            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 8)\n        }\n        resolutionStrategy.eachDependency { d ->\n            if (d.requested.group in ['net.minecraft','de.oceanlabs.mcp'] ||\n                (d.requested.group == 'net.minecraftforge' && d.requested.name == 'forge')) {\n                throw new GradleException('Game/Forge input forbidden in tooling-only resolution')\n            }\n        }\n    }\n}\ndependencies { fgRuntime('net.minecraftforge.gradle:ForgeGradle:5.1.64') }\ndef coordinate = { id ->\n    assert id instanceof ModuleComponentIdentifier\n    def s = id.group + ':' + id.module + ':' + id.version\n    assert s ==~ /[A-Za-z0-9_.+:-]+/\n    s\n}\ndef digest = { File f ->\n    def md = MessageDigest.getInstance('SHA-256')\n    f.withInputStream { input ->\n        byte[] b = new byte[1048576]\n        int n\n        while ((n=input.read(b))!=-1) md.update(b,0,n)\n    }\n    md.digest().encodeHex().toString()\n}\ntasks.register('resolveTooling') {\n    doLast {\n        assert gradle.gradleVersion == '7.6.6'\n        assert JavaVersion.current() == JavaVersion.VERSION_1_8\n        def cfg = configurations.fgRuntime\n        def resolution = cfg.incoming.resolutionResult\n        def components = resolution.allComponents.findAll {\n            it.id instanceof ModuleComponentIdentifier\n        }.collect { c ->\n            [coordinate:coordinate(c.id), reasons:c.selectionReason.descriptions.collect {\n                [cause:it.cause.name(), description:it.description]\n            }]\n        }.sort { it.coordinate }\n        def artifacts = cfg.incoming.artifacts.artifacts.collect { a ->\n            assert a.file.name ==~ /[A-Za-z0-9_.+-]+\\.jar/\n            def attrs = [:]\n            a.variant.attributes.keySet().sort { it.name }.each { k ->\n                attrs[k.name] = a.variant.attributes.getAttribute(k).toString()\n            }\n            [coordinate:coordinate(a.id.componentIdentifier), file:a.file.name,\n             bytes:a.file.length(), sha256:digest(a.file),\n             variant:a.variant.displayName, attributes:attrs]\n        }.sort { a,b -> (a.coordinate+':'+a.file) <=> (b.coordinate+':'+b.file) }\n        def fg = artifacts.findAll { it.coordinate=='net.minecraftforge.gradle:ForgeGradle:5.1.64' }\n        assert fg.size()==1 && fg[0].bytes==458322\n        assert fg[0].sha256=='61ec654c4c96a535e3543d59cf9ca2722e0d673952dae7067d8948402edb116d'\n        def edges = resolution.allDependencies.findAll {\n            it instanceof ResolvedDependencyResult && it.from.id instanceof ModuleComponentIdentifier\n        }.collect {\n            [from:coordinate(it.from.id), requested:it.requested.displayName,\n             selected:coordinate(it.selected.id)]\n        }.sort { it.from+':'+it.requested }\n        def report = [schema:1, scope:'standalone ForgeGradle runtime resolution; no plugin application',\n            gradle:gradle.gradleVersion, java:JavaVersion.current().toString(),\n            requested:'net.minecraftforge.gradle:ForgeGradle:5.1.64',\n            components:components, artifacts:artifacts, edges:edges]\n        def text = JsonOutput.prettyPrint(JsonOutput.toJson(report))+'\\n'\n        assert text.length() < 262144\n        assert !text.contains(project.projectDir.absolutePath)\n        assert !text.contains(gradle.gradleUserHomeDir.absolutePath)\n        file('resolved-tooling.json').setText(text,'UTF-8')\n    }\n}\nGROOVY\nif ! \"$FGRESOLVE_ROOT/gradle-7.6.6/bin/gradle\" -p \"$FGRESOLVE_ROOT/project\" -g \"$FGRESOLVE_ROOT/home\" --no-daemon --max-workers=1 --console=plain -Dorg.gradle.jvmargs=-Xmx256m resolveTooling > \"$FGRESOLVE_ROOT/private.log\" 2>&1; then\n  python3 - <<'PY'\nimport os,pathlib,re\ns=(pathlib.Path(os.environ['FGRESOLVE_ROOT'])/'private.log').read_text(errors='replace')\ns=re.sub(r\"(?:[A-Za-z]:)?/[^\\s'\\\"<>]*\",'<path>',s)\nprint('Tooling resolution failed; bounded diagnostics with paths removed:')\nprint(s[-6000:])\nPY\n  exit 1\nfi\ncat \"$FGRESOLVE_ROOT/project/resolved-tooling.json\"\n{\n  echo '### ForgeGradle tooling resolution'\n  echo 'Standalone runtime configuration only; no Forge plugin, game input, private bundle or release.'\n  echo '```json'\n  cat \"$FGRESOLVE_ROOT/project/resolved-tooling.json\"\n  echo '```'\n} >> \"$GITHUB_STEP_SUMMARY\"\n"
+        },
+        {
+          "name": "Remove owned temporary tooling and diagnostics",
+          "if": "always()",
+          "shell": "bash",
+          "run": "python3 - <<'PY'\nimport os,pathlib,shutil\nroot=os.environ.get('FGRESOLVE_ROOT')\nif root:\n    p=pathlib.Path(root)\n    base=pathlib.Path(os.environ['RUNNER_TEMP']).resolve()\n    assert p.parent.resolve()==base and p.name.startswith('fgresolve.')\n    assert not p.is_symlink()\n    if p.exists(): shutil.rmtree(p)\nPY\n"
+        }
+      ]
+    }
+  }
+}
